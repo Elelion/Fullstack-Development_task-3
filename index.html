@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<HTML>
+
+<HEAD> 
+	<!-- SEO -->
+	<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+	<meta name="Keywords" content="Fullstack Development, Fullstack, Development">
+	<link rel = "shortcut icon" type = "image/x-icon" href = "images/favicon.png"> 
+	<title> LIVE </title>
+
+	<!-- CSS's -->  
+	<link rel="stylesheet/less" href="css/styles.css">        	  
+	<script src="lib/less.min.js"></script>
+
+	<!-- func -->
+	<script src="src/scripts.js" defer></script>	
+</HEAD>
+
+<BODY>
+	<!-- Наше поле для рисования бактерий -->
+	<canvas id="c1" class="grid-gradient"></canvas>
+
+	<p>
+		Cycle: <span id="count">0 | </span>
+		Life: <span id="countLife">0 | </span>
+		Dead: <span id="countDead">0 | </span>
+		Point's: <span id="countPoint">0 | </span>
+	</p>
+	<button id="start">Start</button>
+	<button id="pause">Pause</button>
+	<button id="random">Rand</button>	
+	
+	<br>
+	<br>
+
+	<label>
+        Width <input type="number" id="width" value="300" max="800" step="50">
+    </label>
+
+    <label>
+        Height <input type="number" id="height" value="300" max="800" step="50">
+    </label>
+
+    <label>
+        speed (ms) <input type="number" id="speed" value="300" max="2000" step="25">
+    </label>
+</BODY>
+</HTML>
