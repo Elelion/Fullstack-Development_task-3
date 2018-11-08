@@ -1,14 +1,35 @@
 /* jshint esversion: 6 */
 
-var canvas = document.getElementById('c1'); // 'c1' - ID елемента см. html
-var countLife = document.getElementById('countLife');
-var pausePlay = document.getElementById('pause');
-var start = document.getElementById('start');
-var countPoint = document.getElementById('countPoint');
-var speedGame = document.getElementById('speed');
+// var canvas = document.getElementById('c1'); // 'c1' - ID елемента см. html
 
-var editWidth = document.getElementById('width');
-var editHeight = document.getElementById('height');
+// var countLife = document.getElementById('countLife');
+// var pausePlay = document.getElementById('pause');
+// var start = document.getElementById('start');
+// var countPoint = document.getElementById('countPoint');
+// var speedGame = document.getElementById('speed');
+
+// var editWidth = document.getElementById('width');
+// var editHeight = document.getElementById('height');
+
+
+
+
+var canvas = document.getElementsByClassName('grid-gradient')[0];
+
+var countCycle = document.getElementsByClassName('count__life')[0];
+var countLife = document.getElementsByClassName('count__life')[0];
+var countDead = document.getElementsByClassName('count__dead')[0];
+var pausePlay = document.getElementsByClassName('pause')[0];
+var start = document.getElementsByClassName('start')[0];
+var countPoint = document.getElementsByClassName('count__point')[0];
+var speedGame = document.getElementsByClassName('speed')[0];
+
+var editWidth = document.getElementsByClassName('width')[0];
+var editHeight = document.getElementsByClassName('height')[0];
+
+
+
+
 
 pausePlay.disabled = true;
 
@@ -295,7 +316,7 @@ function resetGame() {
 	statusFieldReset = 1; // стопает цикл игры!!!
 	statusField = 0;
 
-	document.getElementById('count').innerHTML = count + ' | ';
+	countCycle.innerHTML = count + ' | ';
 	countLife.innerHTML = counterLife  + ' | ';
 	countDead.innerHTML = counterDead + ' | ';
 	countPoint.innerHTML = statusField;
@@ -477,7 +498,7 @@ function startLife() {
 		count++;
 
 		// Записываем в span (html) наш счетчик
-		document.getElementById('count').innerHTML = count + ' | ';
+		countCycle.innerHTML = count + ' | ';
 
 		statusField = 0;
 		checkFieldEmpty();
@@ -520,24 +541,33 @@ function fpp(i) {
 }
 
 // Вешаем событие на кнопку
-document.getElementById('start').onclick = startGame;
-document.getElementById('random').onclick = randomFill;
-document.getElementById('pause').onclick = pauseGame;
+// document.getElementById('start').onclick = startGame;
+// document.getElementById('random').onclick = randomFill;
+// document.getElementById('pause').onclick = pauseGame;
 
-document.getElementById('width').onblur = fieldSize;
-document.getElementById('height').onblur = fieldSize;
+// document.getElementById('width').onblur = fieldSize;
+// document.getElementById('height').onblur = fieldSize;
 
+document.getElementsByClassName('start')[0].onclick = startGame;
+document.getElementsByClassName('random')[0].onclick = randomFill;
+document.getElementsByClassName('pause')[0].onclick = pauseGame;
+
+document.getElementsByClassName('width')[0].onblur = fieldSize;
+document.getElementsByClassName('height')[0].onblur = fieldSize;
 
 /**/
 
-document.getElementById('width').onkeypress = function (e) {
+// document.getElementById('width').onkeypress = function (e) {
+document.getElementsByClassName('width')[0].onkeypress = function (e) {
   return false;
 };
 
-document.getElementById('height').onkeypress = function (e) {
+// document.getElementById('height').onkeypress = function (e) {
+document.getElementsByClassName('height')[0].onkeypress = function (e) {
   return false;
 };
 
-document.getElementById('speed').onkeypress = function (e) {
+// document.getElementById('speed').onkeypress = function (e) {
+document.getElementsByClassName('speed')[0].onkeypress = function (e) {
   return false;
 };

@@ -3,14 +3,17 @@
 
 <HEAD> 
 	<!-- SEO -->
-	<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
-	<meta name="Keywords" content="Fullstack Development, Fullstack, Development">
+	<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">	
+	<meta name="Keywords" content="Full Stack Development, FSD, quest-3">
+  	<meta name="description" content="Best of the Best company on the world for Web dev!"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, 
+									maximum-scale=1.0, user-scalable=no">	
+
 	<link rel = "shortcut icon" type = "image/x-icon" href = "images/favicon.png"> 
-	<title> LIVE </title>
+	<title> Live, game </title>
 
 	<!-- CSS's -->  
-	<link rel="stylesheet/less" href="css/styles.css">        	  
-	<script src="lib/less.min.js"></script>
+	<link rel="stylesheet" href="css/styles.css">	
 
 	<!-- func -->
 	<script src="src/scripts.js" defer></script>	
@@ -18,31 +21,35 @@
 
 <BODY>
 	<!-- Наше поле для рисования бактерий -->
-	<canvas id="c1" class="grid-gradient"></canvas>
+	<canvas class="grid-gradient"></canvas> <!-- id="c1"  -->
 
 	<p>
-		Cycle: <span id="count">0 | </span>
-		Life: <span id="countLife">0 | </span>
-		Dead: <span id="countDead">0 | </span>
-		Point's: <span id="countPoint">0 | </span>
+		Cycle: <span class="count__life">0 | </span> <!-- id="count" -->
+		Life: <span class="count__life">0 | </span> <!-- id="countLife" -->
+		Dead: <span class="count__dead">0 | </span> <!-- id="countDead" -->
+		Point's: <span class="count__point">0 | </span> <!-- id="countPoint" -->
 	</p>
-	<button id="start">Start</button>
-	<button id="pause">Pause</button>
-	<button id="random">Rand</button>	
+
+	<button class="start">Start</button> <!-- id="start" -->
+	<button class="pause">Pause</button> <!-- id="pause" -->
+	<button class="random">Rand</button> <!-- id="random" -->
 	
 	<br>
 	<br>
 
 	<label>
-        Width <input type="number" id="width" value="300" max="800" step="50">
+        Width <input type="number" class="width" value="300" max="800" step="50"> 
+        <!-- id="width" -->
     </label>
 
     <label>
-        Height <input type="number" id="height" value="300" max="800" step="50">
+        Height <input type="number" class="height" value="300" max="800" step="50">
+        <!-- id="height" -->
     </label>
 
     <label>
-        speed (ms) <input type="number" id="speed" value="300" max="2000" step="25">
+        speed (ms) <input type="number" class="speed" value="300" max="2000" step="25">
+        <!-- id="speed" -->
     </label>
 </BODY>
 </HTML>

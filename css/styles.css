@@ -1,17 +1,12 @@
-#c1 {
-	border: 2px solid #4C4C4C;
-	margin: 50px;
-}
-
-
 body {
 	text-align: center;
 	color: #999;
 }
 
 .grid-gradient {
+	border: 2px solid #4C4C4C;
 	overflow: hidden;
-	margin: 0 2%;	
+	margin: 50px;
 	box-sizing: border-box;	
 
 	background: linear-gradient(#4C4C4C, transparent 0.5px), /* horizontal */
