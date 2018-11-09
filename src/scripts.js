@@ -16,7 +16,7 @@
 
 var canvas = document.getElementsByClassName('grid-gradient')[0];
 
-var countCycle = document.getElementsByClassName('count__life')[0];
+var countCycle = document.getElementsByClassName('count__cycle')[0];
 var countLife = document.getElementsByClassName('count__life')[0];
 var countDead = document.getElementsByClassName('count__dead')[0];
 var pausePlay = document.getElementsByClassName('pause')[0];
