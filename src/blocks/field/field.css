@@ -1,0 +1,9 @@
+.grid-gradient {
+  border: 2px solid #4C4C4C;
+  overflow: hidden;
+  margin: 50px;
+  box-sizing: border-box;
+  background: linear-gradient(#4C4C4C, transparent 0.5px), linear-gradient(90deg, #4C4C4C, transparent 0.5px);
+  background-color: black; }
+
+/*# sourceMappingURL=field.css.map */

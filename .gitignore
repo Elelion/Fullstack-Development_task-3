@@ -1,0 +1,38 @@
+# ___general___
+
+.vscode
+index-bak.html
+src/images/templates
+src/maket
+src/.sass-cache
+src/styles.css.map
+
+
+# ___content___
+
+src/blocks/content/.sass-cache
+src/blocks/content/content.css.map
+
+
+# ___control-panel___
+
+src/blocks/control-panel/.sass-cache
+src/blocks/control-panel/control-panel.css.map
+
+
+# ___field___
+
+src/blocks/field/.sass-cache
+src/blocks/field/field.css.map
+
+
+# ___log___
+
+src/blocks/log/.sass-cache
+src/blocks/log/log.css.map
+
+
+# ___settings___
+
+src/blocks/settings/.sass-cache
+src/blocks/settings/settings.css.map
