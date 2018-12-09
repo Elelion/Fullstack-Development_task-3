@@ -1,35 +1,19 @@
 /* jshint esversion: 6 */
 
-// var canvas = document.getElementById('c1'); // 'c1' - ID елемента см. html
+const canvas = document.getElementsByClassName('grid-gradient')[0];
 
-// var countLife = document.getElementById('countLife');
-// var pausePlay = document.getElementById('pause');
-// var start = document.getElementById('start');
-// var countPoint = document.getElementById('countPoint');
-// var speedGame = document.getElementById('speed');
+const countCycle = document.getElementsByClassName('count__cycle')[0];
+const countLife = document.getElementsByClassName('count__life')[0];
+const countDead = document.getElementsByClassName('count__dead')[0];
+const pausePlay = document.getElementsByClassName('pause')[0];
+const start = document.getElementsByClassName('start')[0];
+const countPoint = document.getElementsByClassName('count__point')[0];
+const speedGame = document.getElementsByClassName('speed')[0];
 
-// var editWidth = document.getElementById('width');
-// var editHeight = document.getElementById('height');
+const editWidth = document.getElementsByClassName('width')[0];
+const editHeight = document.getElementsByClassName('height')[0];
 
-
-
-
-var canvas = document.getElementsByClassName('grid-gradient')[0];
-
-var countCycle = document.getElementsByClassName('count__cycle')[0];
-var countLife = document.getElementsByClassName('count__life')[0];
-var countDead = document.getElementsByClassName('count__dead')[0];
-var pausePlay = document.getElementsByClassName('pause')[0];
-var start = document.getElementsByClassName('start')[0];
-var countPoint = document.getElementsByClassName('count__point')[0];
-var speedGame = document.getElementsByClassName('speed')[0];
-
-var editWidth = document.getElementsByClassName('width')[0];
-var editHeight = document.getElementsByClassName('height')[0];
-
-
-
-
+// ---
 
 pausePlay.disabled = true;
 
@@ -45,9 +29,9 @@ var ctx = canvas.getContext('2d'); //Двумерный контекст для 
 ctx.fillStyle = "#00FF00"; // цвет квадратика
 
 // Создадим глобальный пустой массив (см. ниже)
-var mas = [];
-var masTemp = [];
-var masSave = [];
+let mas = [];
+let masTemp = [];
+let masSave = [];
 
 // счетчики
 var count = 0;
@@ -76,11 +60,8 @@ var resizeStatus = 0;
 // --------------------------------------------------------------------------------------
 
 function fieldSize() {
-	var editTempWidth = editWidth.value;
-	var editTempHeight = editHeight.value;
-
-	if (editTempWidth < editTempHeight) { 
-		editWidth.value = editTempHeight;
+	if (editWidth.value < editHeight.value) { 
+		editWidth.value = editHeight.value;
 	}
 
 	canvas.width = editWidth.value;
@@ -102,34 +83,13 @@ function fieldSize() {
 
 	fieldSquare = canvasWidth * 1 / pointSize * 1;	
 	location.reload();	
-	
-	/*
-	goLife();	
-
-	for (var key in masSave) {
-		console.log(masSave[key]);
-	}
-
-	// ctx.clearRect(0, 0, canvasWidth, canvasHeight); // Рисуем очищающий прямоугольник от 00(x,y) до 300(x,y)
-
-	// Перебираем массив, и если какой то елемент = 1, то зарисовываем
-	for (var i = 0; i < fieldSquare; i++) {				
-		for (var j = 0; j < fieldSquare; j++) {
-			// условие проверки
-			if(masSave[i][j] == 1) {
-				ctx.fillRect(j * pointSize, i * pointSize, pointSize, pointSize); 				
-			}			
-		}
-	}	
-	*/
 }
-//fieldSize();
 
 // Вешаем на canvas событие click, где event указывает, что мы будем работать с событием
 canvas.onclick = function(event) {
 	// Определим координату мыши относительно canvas
-	var x = event.offsetX;
-	var y = event.offsetY;
+	let x = event.offsetX;
+	let y = event.offsetY;
 	
 	console.log('offsetX: ' + x);
 	console.log('offsetY: ' + y);
@@ -170,7 +130,6 @@ function goLife() {
 		//для перебоки вышесозданного массива, т.е. создаем двумерный массив
 		for (var j = 0; j < n; j++) {
 			mas[i][j] = 0;
-			// console.log('goLife: ' + mas);			
 		}
 	}
 }
@@ -398,67 +357,34 @@ function startLife() {
  * одного шага назад)
  */
 				isAlive = mas[i][j]; // т.е. это текущее состояние с точками
-				// console.log(isAlive);
 
 				// проверка на соседей:				
-				/*
 				if (isAlive == 0 && neighbors === 3) {
 					mas2[i][j] = 1;
 					counterLife++;
 					countLife.innerHTML = counterLife  + ' | ';
+				} else {
+					if (isAlive == 1 && (neighbors === 3 || neighbors === 2)) {
+						mas2[i][j] = 1; 
+						counterLife++;
+						countLife.innerHTML = counterLife  + ' | ';
+					} else {
+						if (isAlive == 1 && neighbors > 3) {
+							mas2[i][j] = 0;
+							counterDead++;
+							countDead.innerHTML = counterDead  + ' | ';
+						} else {
+							if (isAlive == 1 && neighbors < 2) {
+								mas2[i][j] = 0;
+								counterDead++;
+								countDead.innerHTML = counterDead  + ' | ';
+							} else { 
+								mas2[i][j] = 0; counterDead++;
+									countDead.innerHTML = counterDead + ' | ';
+							}
+						}
+					}
 				}
-
-				if (isAlive == 1 && (neighbors === 3 || neighbors === 2)) {
-					mas2[i][j] = 1;	
-					counterLife++;
-					countLife.innerHTML = counterLife  + ' | ';
-				}
-
-				if (isAlive == 1 && neighbors > 3) {
-					mas2[i][j] = 0;
-					counterDead++;
-					countDead.innerHTML = counterDead  + ' | ';
-				}
-
-				if (isAlive == 1 && neighbors < 2) {
-					mas2[i][j] = 0;
-					counterDead++;
-					countDead.innerHTML = counterDead  + ' | ';
-				}
-
-				if (isAlive == 0 && neighbors < 2) {
-					mas2[i][j] = 0;
-					counterDead++;
-					countDead.innerHTML = counterDead  + ' | ';
-				}
-				*/
-
-				if (isAlive == 0 && neighbors === 3) {
-                    mas2[i][j] = 1;
-                    counterLife++;
-                    countLife.innerHTML = counterLife  + ' | ';
-                } else {
-                    if (isAlive == 1 && (neighbors === 3 || neighbors === 2)) {
-                        mas2[i][j] = 1; 
-                        counterLife++;
-                        countLife.innerHTML = counterLife  + ' | ';
-                    } else {
-                        if (isAlive == 1 && neighbors > 3) {
-                            mas2[i][j] = 0;
-                            counterDead++;
-                            countDead.innerHTML = counterDead  + ' | ';
-                        } else {
-                            if (isAlive == 1 && neighbors < 2) {
-                                mas2[i][j] = 0;
-                                counterDead++;
-                                countDead.innerHTML = counterDead  + ' | ';
-                            } else { 
-                            	mas2[i][j] = 0; counterDead++;
-                                countDead.innerHTML = counterDead + ' | ';
-                            }
-                        }
-                    }
-                }
 
 				// Проверка на наличие точек на поле
 				if (statusField < 1 && randomStatus == 0) {
@@ -509,22 +435,13 @@ function startLife() {
 	} else {
 		return;
 	}
-
-	// выводим наш массив в читабельном виде	
-	/*console.log('___ARRAY___');
-
-	for (var key in mas) {
-		console.log(mas[key]);
-	}*/
 }
 
 // учитываем выход за предел поля с верху
 function topField(i) {
-	if (i == 0) { 
-		// console.log('topField: ' + fieldSquare); 
+	if (i == 0) {
 		return fieldSquare;
-	} else { 
-		// console.log('topField i: ' + i); 
+	} else {
 		return i; 
 	}
 }
@@ -532,22 +449,13 @@ function topField(i) {
 // учитываем выход за предел поля с права
 function fpp(i) {
 	if (i == fieldSquare * 1 - 1) {
-		// console.log('fpp: ' + -1); 
 		return -1; 
-	} else { 
-		// console.log('fpp i: ' + i); 
+	} else {
 		return i; 
 	}
 }
 
 // Вешаем событие на кнопку
-// document.getElementById('start').onclick = startGame;
-// document.getElementById('random').onclick = randomFill;
-// document.getElementById('pause').onclick = pauseGame;
-
-// document.getElementById('width').onblur = fieldSize;
-// document.getElementById('height').onblur = fieldSize;
-
 document.getElementsByClassName('start')[0].onclick = startGame;
 document.getElementsByClassName('random')[0].onclick = randomFill;
 document.getElementsByClassName('pause')[0].onclick = pauseGame;
@@ -557,17 +465,14 @@ document.getElementsByClassName('height')[0].onblur = fieldSize;
 
 /**/
 
-// document.getElementById('width').onkeypress = function (e) {
 document.getElementsByClassName('width')[0].onkeypress = function (e) {
   return false;
 };
 
-// document.getElementById('height').onkeypress = function (e) {
 document.getElementsByClassName('height')[0].onkeypress = function (e) {
   return false;
 };
 
-// document.getElementById('speed').onkeypress = function (e) {
 document.getElementsByClassName('speed')[0].onkeypress = function (e) {
   return false;
 };
