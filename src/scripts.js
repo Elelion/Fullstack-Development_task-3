@@ -15,47 +15,53 @@ const editHeight = document.getElementsByClassName('height')[0];
 
 // ---
 
-pausePlay.disabled = true;
+// TODO: переписать переменные, с начала пустые, потом присвоенные значения
+// var timer; // таймер для отрисовки
 
 // default value
 canvas.width = editWidth.value;
 canvas.height = editHeight.value;
 
-var canvasWidth = canvas.width; // габариты поля Ш
-var canvasHeight = canvas.height; // габариты поля В
-
 // Объявляем контекст
-var ctx = canvas.getContext('2d'); //Двумерный контекст для рисования
-ctx.fillStyle = "#00FF00"; // цвет квадратика
-
-// Создадим глобальный пустой массив (см. ниже)
-let mas = [];
-let masTemp = [];
-let masSave = [];
+let ctx = canvas.getContext('2d'); //Двумерный контекст для рисования
 
 // счетчики
 var count = 0;
 var counterLife = 0;
 var counterDead = 0;
 
-// таймер для отрисовки
-var timer;
-
 // user data:
 var pointSize = 10;
-var fieldSquare = canvasWidth * 1 / pointSize * 1; // 300 / 10 = 30, т.е. массив будет 30х30
+var fieldSquare = canvas.width * 1 / pointSize * 1; // 300 / 10 = 30, т.е. массив будет 30х30
+var randomStep = canvas.width * 70 / 100; // для случаенного заполнения поля, см.: fieldSize()
 
-// размер для клеточного поля, идет от размера квадратика, который ставиться при клике
-canvas.style.backgroundSize = pointSize + 'px ' + pointSize + 'px';
-
-var randomStep = canvasWidth * 70 / 100; // для случаенного заполнения поля, см.: fieldSize()
 var pausePlayStatus = 0;
 var startSpeed = 0;
 var statusField = 0; // 0 - поле пустое, если > 0 - на поле есть точки
 var statusFieldReset = 0; // для кнопки RESET, 0 - кнопка НЕ была нажата, 1 - нажата.
 var randomStatus = 0; // если рандомизируем игра НЕ сбрасывается, 0 - не рандомили, 1 - рандомили
 var startStatus = 0; // 0 - старт, 1 - стоп
-var resizeStatus = 0;
+// var resizeStatus = 0;
+
+// ---
+
+pausePlay.disabled = true;
+
+// размер для клеточного поля, идет от размера квадратика, который ставиться при клике
+canvas.style.backgroundSize = pointSize + 'px ' + pointSize + 'px';
+
+
+ctx.fillStyle = '#00FF00'; // цвет квадратика
+
+// Создадим глобальный пустой массив (см. ниже)
+let field = function field() {
+	let field = [];
+	return field;
+}
+
+// FIXME: подумать надо ли это или нет
+// let masTemp = [];
+// let masSave = [];
 
 // --------------------------------------------------------------------------------------
 
@@ -67,21 +73,20 @@ function fieldSize() {
 	canvas.width = editWidth.value;
 	canvas.height = editHeight.value;
 	
-	canvasWidth = editWidth.value;
-	canvasHeight = editHeight.value;
+	canvas.width = editWidth.value;
+	canvas.height = editHeight.value;
 
-	// ctx = canvas.getContext('2d'); //Двумерный контекст для рисования
-	ctx.fillStyle = "#00FF00"; // цвет квадратика
+	// ctx = canvas.getContext('2d'); //Двумерный контекст для рисования	
 	// ctx.clearRect(0, 0, canvasWidth, canvasHeight);		
 	
-	if (canvasWidth > canvasHeight || canvasWidth == canvasHeight) {
-		randomStep = canvasWidth * 70 / 100;
+	if (canvas.width > canvas.height || canvas.width == canvas.height) {
+		randomStep = canvas.width * 70 / 100;
 	} else {
-		randomStep = canvasHeight * 70 / 100;
+		randomStep = canvas.height * 70 / 100;
 		console.log('randomStep: ' + randomStep);
 	}
 
-	fieldSquare = canvasWidth * 1 / pointSize * 1;	
+	fieldSquare = canvas.width * 1 / pointSize * 1;	
 	location.reload();	
 }
 
@@ -100,19 +105,18 @@ canvas.onclick = function(event) {
 
 	console.log('X: ' + x);
 	console.log('Y: ' + y);
-
-	if (mas[y][x] == 0) {
-		mas[y][x] = 1; // Заполнение игрового поля, т.е. куда кликнем, там будет ЕДИНИЦА
+	
+	if (field[y][x] == 0) {
+		field[y][x] = 1; // Заполнение игрового поля, т.е. куда кликнем, там будет ЕДИНИЦА
 	} else {
-		mas[y][x] = 0;
+		field[y][x] = 0;
 	}
 
 	// Проверяем
-	console.log(mas); //В начале и в конце будет 1, если тыкнуть на начало и конце поля
-	masTemp = mas;	
+	console.log(field); //В начале и в конце будет 1, если тыкнуть на начало и конце поля
+	// masTemp = mas;	// подумать надо ли это или нет
 
 	drawField(); // Ф-ция которая будет отрисовывать точку при клике		
-	
 };
 
 /* определяем координату X и Y елемента по которому мы кликаем
@@ -125,11 +129,11 @@ function goLife() {
 	var n = fieldSquare;
 	var m = fieldSquare;
 	for (var i = 0; i < m; i++) {
-		mas[i] = []; // Объявляем пустой массив
+		field[i] = []; // Объявляем пустой массив
 
 		//для перебоки вышесозданного массива, т.е. создаем двумерный массив
 		for (var j = 0; j < n; j++) {
-			mas[i][j] = 0;
+			field[i][j] = 0;
 		}
 	}
 }
@@ -137,19 +141,19 @@ goLife(); //Запускаем наше игровое поле
 
 //Ф-ция для отрисоки прямоугольников при клике
 function drawField() {
-	ctx.clearRect(0, 0, canvasWidth, canvasHeight); // Рисуем очищающий прямоугольник от 00(x,y) до 300(x,y)
+	ctx.clearRect(0, 0, canvas.width, canvas.height); // Рисуем очищающий прямоугольник от 00(x,y) до 300(x,y)
 
 	// Перебираем массив, и если какой то елемент = 1, то зарисовываем
 	for (var i = 0; i < fieldSquare; i++) {				
 		for (var j = 0; j < fieldSquare; j++) {
 			// условие проверки
-			if(mas[i][j] == 1) {
+			if (field[i][j] == 1) {
 				// квадратик будет размером 10px(10, 10), если кликаем в первом поле, 
 				// координата должна быть от 0 до 10, если во втором поле от 10 до 20 и.т.д.
 				// т.е. по сути это задает точку под указателем мышки при клике
 				ctx.fillRect(j * pointSize, i * pointSize, pointSize, pointSize); 				
 			}
-			masSave[i] = mas[i];
+			// masSave[i] = mas[i]; // подумать надо ли это или нет
 		}
 	}	
 }
@@ -161,26 +165,26 @@ function randomFill() {
 	for (var i = 0; i < fieldSquare; i++) {
 		for (var j = 0; j < fieldSquare; j++) {			
 			statusField = 0;
-			mas[i][j] = 0;
+			field[i][j] = 0;
 		}
 	}
 
-	ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	var max;
 	var min = 1;
 
 	// Берем максимальное значение от ширины или высоты, смотря что больше.
-	if (canvasWidth > canvasHeight) {
-		max = canvasWidth;		
+	if (canvas.width > canvas.height) {
+		max = canvas.width;		
 	} else {
-		max = canvasHeight;
+		max = canvas.height;
 	}
 
-	if (canvasWidth == canvasHeight) {
-		max = canvasWidth;
+	if (canvas.width == canvas.height) {
+		max = canvas.width;
 	} else { 
-		max = canvasWidth;
+		max = canvas.width;
 	}
 
 	for (let i = 0; i < randomStep; i++) {
@@ -193,7 +197,7 @@ function randomFill() {
 		x = Math.floor(x / pointSize);
 		y = Math.floor(y / pointSize);
 
-		mas[y][x] = 1; // Заполнение игрового поля сгенерированными рандомными числами
+		field[y][x] = 1; // Заполнение игрового поля сгенерированными рандомными числами
 
 		drawField();
 	}
@@ -202,7 +206,7 @@ function randomFill() {
 function checkFieldEmpty() {	
 	for (var i = 0; i < fieldSquare; i++) {
 		for (var j = 0; j < fieldSquare; j++) {
-			if (mas[i][j] != 0) {
+			if (field[i][j] != 0) {
 				statusField++;
 			}
 		}
@@ -247,7 +251,7 @@ function startGame() {
 			
 			pausePlay.disabled = false;
 		} else {
-			alert("Нужно больше точек...");
+			alert('Нужно больше точек...');
 		}
 
 		startStatus = 1;
@@ -286,7 +290,7 @@ function resetGame() {
 	start.innerHTML = 'Play';
 	start.disabled = false;
 
-	console.log("RESET: (statusFieldReset): " + statusFieldReset);
+	console.log('RESET: (statusFieldReset): ' + statusFieldReset);
 }
 
 // тут наше первое условие: если клетка имеет 2 или 3 соседа, то она выживает
@@ -294,12 +298,12 @@ function resetGame() {
 
 // ф-ция отвечающая за жизнь клетки
 function startLife() {
-	var mas2 = [];	
-	var isAlive = [];
+	var field2 = [];	
+	var isAlive = [];	
 
-	if (pausePlayStatus == 0  && statusFieldReset == 0) {
+	if (pausePlayStatus == 0  && statusFieldReset == 0) {		
 		for (var i = 0; i < fieldSquare; i++) {			
-			mas2[i] = [];
+			field2[i] = [];
 			// console.log('mas2:' + mas2);
 			for (var j = 0; j < fieldSquare; j++) {				
 				// мы должны посчитать кол-во соседей, нужно учесть что тут у нас встречаются
@@ -307,35 +311,35 @@ function startLife() {
 				var neighbors = 0;	
 
 				// считаем соседей с верху + ф-цию см. ниже
-				if (mas[topField(i) - 1][j] == 1) neighbors++;
+				if (field[topField(i) - 1][j] == 1) neighbors++;
 				// if (mas[i][j - 1] == 1) neighbors++;
 
 				// считаем соседей с права
-				if (mas[i][fpp(j) + 1] == 1) neighbors++;
+				if (field[i][fpp(j) + 1] == 1) neighbors++;
 				// if (mas[i + 1][j] == 1) neighbors++;
 
 				// сосед с низу
-				if (mas[fpp(i) + 1][j] == 1) neighbors++;
+				if (field[fpp(i) + 1][j] == 1) neighbors++;
 				// if (mas[i][j + 1] == 1) neighbors++;
 
 				// сосед с лева
-				if (mas[i][topField(j) - 1] == 1) neighbors++;
+				if (field[i][topField(j) - 1] == 1) neighbors++;
 				// if (mas[i - 1][j] == 1) neighbors++;
 
 				// соседи по диагонали в право вверх /
-				if (mas[topField(i) - 1][fpp(j) + 1] == 1) neighbors++;
+				if (field[topField(i) - 1][fpp(j) + 1] == 1) neighbors++;
 				// if (mas[i + 1][j - 1] == 1) neighbors++;
 
 				// соседи по диагонали в право в низ \
-				if (mas[fpp(i) + 1][fpp(j) + 1] == 1) neighbors++;
+				if (field[fpp(i) + 1][fpp(j) + 1] == 1) neighbors++;
 				// if (mas[i + 1][j + 1] == 1) neighbors++;
 
 				// соседи по диагонали в лево в низ /
-				if (mas[fpp(i) + 1][topField(j) - 1] == 1) neighbors++;
+				if (field[fpp(i) + 1][topField(j) - 1] == 1) neighbors++;
 				// if (mas[i - 1][j + 1] == 1) neighbors++;
 
 				// соседи по диагонали в лево в верх \
-				if (mas[topField(i) - 1][topField(j) - 1] == 1) neighbors++;
+				if (field[topField(i) - 1][topField(j) - 1] == 1) neighbors++;
 				// if (mas[i - 1][j - 1] == 1) neighbors++;
 
 /*
@@ -356,30 +360,30 @@ function startLife() {
  * (складывается стабильная конфигурация; предыдущее правило, вырожденное до 
  * одного шага назад)
  */
-				isAlive = mas[i][j]; // т.е. это текущее состояние с точками
+				isAlive = field[i][j]; // т.е. это текущее состояние с точками
 
 				// проверка на соседей:				
 				if (isAlive == 0 && neighbors === 3) {
-					mas2[i][j] = 1;
+					field2[i][j] = 1;
 					counterLife++;
 					countLife.innerHTML = counterLife  + ' | ';
 				} else {
 					if (isAlive == 1 && (neighbors === 3 || neighbors === 2)) {
-						mas2[i][j] = 1; 
+						field2[i][j] = 1; 
 						counterLife++;
 						countLife.innerHTML = counterLife  + ' | ';
 					} else {
 						if (isAlive == 1 && neighbors > 3) {
-							mas2[i][j] = 0;
+							field2[i][j] = 0;
 							counterDead++;
 							countDead.innerHTML = counterDead  + ' | ';
 						} else {
 							if (isAlive == 1 && neighbors < 2) {
-								mas2[i][j] = 0;
+								field2[i][j] = 0;
 								counterDead++;
 								countDead.innerHTML = counterDead  + ' | ';
 							} else { 
-								mas2[i][j] = 0; counterDead++;
+								field2[i][j] = 0; counterDead++;
 									countDead.innerHTML = counterDead + ' | ';
 							}
 						}
@@ -388,23 +392,23 @@ function startLife() {
 
 				// Проверка на наличие точек на поле
 				if (statusField < 1 && randomStatus == 0) {
-					alert("GameOver man!. Все точки сдохли, плодиться не кому.");
+					alert('GameOver man!. Все точки сдохли, плодиться не кому.');
 					// alert("Страничка будет перезагружена, а все параметры сброшены.");
 
-					var request = prompt("Введите: НЕТ - что бы остаться на страничке", "");
+					var request = prompt('Введите: НЕТ - что бы остаться на страничке', '');
 					switch (request) {
-						case "ДА": 
+						case 'ДА': 
 							location.reload(); 
 							break;
 
-						case "НЕТ": case "Нет": case "нет": case "НеТ": 
-						case "НЕт": case "неТ": case "нЕт":
+						case 'НЕТ': case 'Нет': case 'нет': case 'НеТ': 
+						case 'НЕт': case 'неТ': case 'нЕт':
 							pausePlay.disabled = true;
 							start.disabled = true;
 							break;
 
 						default: 
-							alert("Некорректное действие, страница будет перезагружена");
+							alert('Некорректное действие, страница будет перезагружена');
 							location.reload(); // перезагрузки странички
 							break;
 					}
@@ -415,7 +419,7 @@ function startLife() {
 		}
 
 		// присваиваем новое состояние
-		mas = mas2;
+		field = field2;
 
 		// Запускаем ф-цию отрисовки
 		drawField();
@@ -431,28 +435,27 @@ function startLife() {
 
 		countPoint.innerHTML = statusField;
 		randomStatus = 0; // отбой нашего рандома
-		timer = setTimeout(startLife, speedGame.value); //Где 300 это период отрисовки
-	} else {
-		return;
+		
+		// таймер для отрисовки
+		let timer = setTimeout(startLife, speedGame.value); //Где 300 это период отрисовки
 	}
+	return;	
 }
 
 // учитываем выход за предел поля с верху
 function topField(i) {
 	if (i == 0) {
 		return fieldSquare;
-	} else {
-		return i; 
 	}
+	return i;
 }
 
 // учитываем выход за предел поля с права
 function fpp(i) {
 	if (i == fieldSquare * 1 - 1) {
 		return -1; 
-	} else {
-		return i; 
 	}
+	return i;
 }
 
 // Вешаем событие на кнопку
