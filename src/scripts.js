@@ -76,9 +76,6 @@ function fieldSize() {
 	canvas.width = editWidth.value;
 	canvas.height = editHeight.value;
 
-	// ctx = canvas.getContext('2d'); //Двумерный контекст для рисования	
-	// ctx.clearRect(0, 0, canvasWidth, canvasHeight);		
-	
 	if (canvas.width > canvas.height || canvas.width == canvas.height) {
 		randomStep = canvas.width * 70 / 100;
 	} else {
@@ -247,7 +244,6 @@ function startGame() {
 			statusFieldReset = 0; // сначала надо сбросить наш RESET !!!
 
 			startLife();
-			// speed();
 			
 			pausePlay.disabled = false;
 		} else {
@@ -392,8 +388,7 @@ function startLife() {
 
 				// Проверка на наличие точек на поле
 				if (statusField < 1 && randomStatus == 0) {
-					alert('GameOver man!. Все точки сдохли, плодиться не кому.');
-					// alert("Страничка будет перезагружена, а все параметры сброшены.");
+					alert('GameOver man!. Все точки сдохли, плодиться не кому.');					
 
 					var request = prompt('Введите: НЕТ - что бы остаться на страничке', '');
 					switch (request) {
