@@ -1,476 +1,148 @@
-/* jshint esversion: 6 */
-
-const canvas = document.getElementsByClassName('grid-gradient')[0];
-
-const countCycle = document.getElementsByClassName('count__cycle')[0];
-const countLife = document.getElementsByClassName('count__life')[0];
-const countDead = document.getElementsByClassName('count__dead')[0];
-const pausePlay = document.getElementsByClassName('pause')[0];
-const start = document.getElementsByClassName('start')[0];
-const countPoint = document.getElementsByClassName('count__point')[0];
-const speedGame = document.getElementsByClassName('speed')[0];
-
-const editWidth = document.getElementsByClassName('width')[0];
-const editHeight = document.getElementsByClassName('height')[0];
-
-// ---
-
-// TODO: переписать переменные, с начала пустые, потом присвоенные значения
-// var timer; // таймер для отрисовки
-
-// default value
-canvas.width = editWidth.value;
-canvas.height = editHeight.value;
-
-// Объявляем контекст
-let ctx = canvas.getContext('2d'); //Двумерный контекст для рисования
-
-// счетчики
-var count = 0;
-var counterLife = 0;
-var counterDead = 0;
-
-// user data:
-var pointSize = 10;
-var fieldSquare = canvas.width * 1 / pointSize * 1; // 300 / 10 = 30, т.е. массив будет 30х30
-var randomStep = canvas.width * 70 / 100; // для случаенного заполнения поля, см.: fieldSize()
-
-var pausePlayStatus = 0;
-var startSpeed = 0;
-var statusField = 0; // 0 - поле пустое, если > 0 - на поле есть точки
-var statusFieldReset = 0; // для кнопки RESET, 0 - кнопка НЕ была нажата, 1 - нажата.
-var randomStatus = 0; // если рандомизируем игра НЕ сбрасывается, 0 - не рандомили, 1 - рандомили
-var startStatus = 0; // 0 - старт, 1 - стоп
-// var resizeStatus = 0;
-
-// ---
-
-pausePlay.disabled = true;
-
-// размер для клеточного поля, идет от размера квадратика, который ставиться при клике
-canvas.style.backgroundSize = pointSize + 'px ' + pointSize + 'px';
-
-
-ctx.fillStyle = '#00FF00'; // цвет квадратика
-
-// Создадим глобальный пустой массив (см. ниже)
-let field = function field() {
-	let field = [];
-	return field;
-}
-
-// FIXME: подумать надо ли это или нет
-// let masTemp = [];
-// let masSave = [];
-
-// --------------------------------------------------------------------------------------
-
-function fieldSize() {
-	if (editWidth.value < editHeight.value) { 
-		editWidth.value = editHeight.value;
-	}
-
-	canvas.width = editWidth.value;
-	canvas.height = editHeight.value;
-	
-	canvas.width = editWidth.value;
-	canvas.height = editHeight.value;
-
-	if (canvas.width > canvas.height || canvas.width == canvas.height) {
-		randomStep = canvas.width * 70 / 100;
-	} else {
-		randomStep = canvas.height * 70 / 100;
-		console.log('randomStep: ' + randomStep);
-	}
-
-	fieldSquare = canvas.width * 1 / pointSize * 1;	
-	location.reload();	
-}
-
-// Вешаем на canvas событие click, где event указывает, что мы будем работать с событием
-canvas.onclick = function(event) {
-	// Определим координату мыши относительно canvas
-	let x = event.offsetX;
-	let y = event.offsetY;
-	
-	console.log('offsetX: ' + x);
-	console.log('offsetY: ' + y);
-
-	// Поля от 0 до 10 будут принадлежать первому кубику, от 10 до 20 - 2му, и.т.д.
-	x = Math.floor(x / pointSize); //300 / 10 = 30 кубиков, затем округляем в нижнюю сторону
-	y = Math.floor(y / pointSize);
-
-	console.log('X: ' + x);
-	console.log('Y: ' + y);
-	
-	if (field[y][x] == 0) {
-		field[y][x] = 1; // Заполнение игрового поля, т.е. куда кликнем, там будет ЕДИНИЦА
-	} else {
-		field[y][x] = 0;
-	}
-
-	// Проверяем
-	console.log(field); //В начале и в конце будет 1, если тыкнуть на начало и конце поля
-	// masTemp = mas;	// подумать надо ли это или нет
-
-	drawField(); // Ф-ция которая будет отрисовывать точку при клике		
-};
-
-/* определяем координату X и Y елемента по которому мы кликаем
- * наше поле 300х300 мы разобьем на 30 квадратиков в ширину и высоту
- * за это представление будет отвечать массив. Если поле будет пустое, то там будет НОЛЬ.
- */
-
-// создаем массмв, который будет еметировать пустое игровое поле
-function goLife() {
-	var n = fieldSquare;
-	var m = fieldSquare;
-	for (var i = 0; i < m; i++) {
-		field[i] = []; // Объявляем пустой массив
-
-		//для перебоки вышесозданного массива, т.е. создаем двумерный массив
-		for (var j = 0; j < n; j++) {
-			field[i][j] = 0;
-		}
-	}
-}
-goLife(); //Запускаем наше игровое поле
-
-//Ф-ция для отрисоки прямоугольников при клике
-function drawField() {
-	ctx.clearRect(0, 0, canvas.width, canvas.height); // Рисуем очищающий прямоугольник от 00(x,y) до 300(x,y)
-
-	// Перебираем массив, и если какой то елемент = 1, то зарисовываем
-	for (var i = 0; i < fieldSquare; i++) {				
-		for (var j = 0; j < fieldSquare; j++) {
-			// условие проверки
-			if (field[i][j] == 1) {
-				// квадратик будет размером 10px(10, 10), если кликаем в первом поле, 
-				// координата должна быть от 0 до 10, если во втором поле от 10 до 20 и.т.д.
-				// т.е. по сути это задает точку под указателем мышки при клике
-				ctx.fillRect(j * pointSize, i * pointSize, pointSize, pointSize); 				
-			}
-			// masSave[i] = mas[i]; // подумать надо ли это или нет
-		}
-	}	
-}
-
-function randomFill() {		
-	randomStatus = 1; // говорим, что мы нажали рандом
-
-	// Очищаем массив каждый раз
-	for (var i = 0; i < fieldSquare; i++) {
-		for (var j = 0; j < fieldSquare; j++) {			
-			statusField = 0;
-			field[i][j] = 0;
-		}
-	}
-
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-	var max;
-	var min = 1;
-
-	// Берем максимальное значение от ширины или высоты, смотря что больше.
-	if (canvas.width > canvas.height) {
-		max = canvas.width;		
-	} else {
-		max = canvas.height;
-	}
-
-	if (canvas.width == canvas.height) {
-		max = canvas.width;
-	} else { 
-		max = canvas.width;
-	}
-
-	for (let i = 0; i < randomStep; i++) {
-		var randX = Math.round(Math.random() * (max - min) + min);
-		var randY = Math.round(Math.random() * (max - min) + min);
-
-		var x = randX;
-		var y = randY;
-
-		x = Math.floor(x / pointSize);
-		y = Math.floor(y / pointSize);
-
-		field[y][x] = 1; // Заполнение игрового поля сгенерированными рандомными числами
-
-		drawField();
-	}
-}
-
-function checkFieldEmpty() {	
-	for (var i = 0; i < fieldSquare; i++) {
-		for (var j = 0; j < fieldSquare; j++) {
-			if (field[i][j] != 0) {
-				statusField++;
-			}
-		}
-	}
-
-	countPoint.innerHTML = statusField;
-}
-
-function pauseGame() {
-	if (pausePlayStatus == 0) {
-		pausePlayStatus = 1;	
-		pausePlay.innerHTML = 'Play';
-
-		start.disabled = true; // отрубаем нашу кнопку которая увеличивает скорость
-		
-	} else {
-		pausePlayStatus = 0;
-		pausePlay.innerHTML = 'Pause';
-
-		startLife(); // в данном случае - продолжаем нашу игру
-
-		start.disabled = false; // включаем обратно
-	}	
-
-	(pausePlayStatus == 0) ? console.log('play') : console.log('pause');
-}
-
-function speed() {
-	startSpeed++;
-	start.innerHTML = 'speed: x' + startSpeed;
-}
-
-function startGame() {
-	if (startStatus == 0) {
-		checkFieldEmpty();
-
-		if (statusField > 1) {
-			statusFieldReset = 0; // сначала надо сбросить наш RESET !!!
-
-			startLife();
-			
-			pausePlay.disabled = false;
-		} else {
-			alert('Нужно больше точек...');
-		}
-
-		startStatus = 1;
-		start.innerHTML = 'Stop';
-		console.log('startStatus: ' + startStatus);
-	} else {
-		resetGame();
-
-		startStatus = 0;
-		start.innerHTML = 'Start';
-	}
-}
-
-function resetGame() {
-	pausePlayStatus = 1;
-
-	goLife();
-	drawField();
-
-	count = 0;
-	counterLife = 0;
-	counterDead = 0;
-	pausePlayStatus = 0;
-	startSpeed = 0;
-	statusFieldReset = 1; // стопает цикл игры!!!
-	statusField = 0;
-
-	countCycle.innerHTML = count + ' | ';
-	countLife.innerHTML = counterLife  + ' | ';
-	countDead.innerHTML = counterDead + ' | ';
-	countPoint.innerHTML = statusField;
-
-	pausePlay.innerHTML = 'Pause';
-	pausePlay.disabled = true;	
-
-	start.innerHTML = 'Play';
-	start.disabled = false;
-
-	console.log('RESET: (statusFieldReset): ' + statusFieldReset);
-}
-
-// тут наше первое условие: если клетка имеет 2 или 3 соседа, то она выживает
-// во всех остальных вариантах она погибает
-
-// ф-ция отвечающая за жизнь клетки
-function startLife() {
-	var field2 = [];	
-	var isAlive = [];	
-
-	if (pausePlayStatus == 0  && statusFieldReset == 0) {		
-		for (var i = 0; i < fieldSquare; i++) {			
-			field2[i] = [];
-			// console.log('mas2:' + mas2);
-			for (var j = 0; j < fieldSquare; j++) {				
-				// мы должны посчитать кол-во соседей, нужно учесть что тут у нас встречаются
-				// краевые условия
-				var neighbors = 0;	
-
-				// считаем соседей с верху + ф-цию см. ниже
-				if (field[topField(i) - 1][j] == 1) neighbors++;
-				// if (mas[i][j - 1] == 1) neighbors++;
-
-				// считаем соседей с права
-				if (field[i][fpp(j) + 1] == 1) neighbors++;
-				// if (mas[i + 1][j] == 1) neighbors++;
-
-				// сосед с низу
-				if (field[fpp(i) + 1][j] == 1) neighbors++;
-				// if (mas[i][j + 1] == 1) neighbors++;
-
-				// сосед с лева
-				if (field[i][topField(j) - 1] == 1) neighbors++;
-				// if (mas[i - 1][j] == 1) neighbors++;
-
-				// соседи по диагонали в право вверх /
-				if (field[topField(i) - 1][fpp(j) + 1] == 1) neighbors++;
-				// if (mas[i + 1][j - 1] == 1) neighbors++;
-
-				// соседи по диагонали в право в низ \
-				if (field[fpp(i) + 1][fpp(j) + 1] == 1) neighbors++;
-				// if (mas[i + 1][j + 1] == 1) neighbors++;
-
-				// соседи по диагонали в лево в низ /
-				if (field[fpp(i) + 1][topField(j) - 1] == 1) neighbors++;
-				// if (mas[i - 1][j + 1] == 1) neighbors++;
-
-				// соседи по диагонали в лево в верх \
-				if (field[topField(i) - 1][topField(j) - 1] == 1) neighbors++;
-				// if (mas[i - 1][j - 1] == 1) neighbors++;
-
-/*
- * Распределение живых клеток в начале игры называется первым поколением. 
- * Каждое следующее поколение рассчитывается на основе предыдущего по таким правилам:
- * 
- * - в пустой (мёртвой) клетке, рядом с которой ровно три живые клетки, зарождается жизнь;
- * - если у живой клетки есть две или три живые соседки, то эта клетка продолжает жить; 
- * в противном случае, если соседей меньше двух или больше трёх, клетка умирает 
- * («от одиночества» или «от перенаселённости»)
- * 
- * Игра прекращается, если
- * 
- * - на поле не останется ни одной «живой» клетки
- * - конфигурация на очередном шаге в точности (без сдвигов и поворотов) повторит себя же 
- * на одном из более ранних шагов (складывается периодическая конфигурация)
- * - при очередном шаге ни одна из клеток не меняет своего состояния 
- * (складывается стабильная конфигурация; предыдущее правило, вырожденное до 
- * одного шага назад)
- */
-				isAlive = field[i][j]; // т.е. это текущее состояние с точками
-
-				// проверка на соседей:				
-				if (isAlive == 0 && neighbors === 3) {
-					field2[i][j] = 1;
-					counterLife++;
-					countLife.innerHTML = counterLife  + ' | ';
-				} else {
-					if (isAlive == 1 && (neighbors === 3 || neighbors === 2)) {
-						field2[i][j] = 1; 
-						counterLife++;
-						countLife.innerHTML = counterLife  + ' | ';
-					} else {
-						if (isAlive == 1 && neighbors > 3) {
-							field2[i][j] = 0;
-							counterDead++;
-							countDead.innerHTML = counterDead  + ' | ';
-						} else {
-							if (isAlive == 1 && neighbors < 2) {
-								field2[i][j] = 0;
-								counterDead++;
-								countDead.innerHTML = counterDead  + ' | ';
-							} else { 
-								field2[i][j] = 0; counterDead++;
-									countDead.innerHTML = counterDead + ' | ';
-							}
-						}
-					}
-				}
-
-				// Проверка на наличие точек на поле
-				if (statusField < 1 && randomStatus == 0) {
-					alert('GameOver man!. Все точки сдохли, плодиться не кому.');					
-
-					var request = prompt('Введите: НЕТ - что бы остаться на страничке', '');
-					switch (request) {
-						case 'ДА': 
-							location.reload(); 
-							break;
-
-						case 'НЕТ': case 'Нет': case 'нет': case 'НеТ': 
-						case 'НЕт': case 'неТ': case 'нЕт':
-							pausePlay.disabled = true;
-							start.disabled = true;
-							break;
-
-						default: 
-							alert('Некорректное действие, страница будет перезагружена');
-							location.reload(); // перезагрузки странички
-							break;
-					}
-
-					return;
-				}
-			}
-		}
-
-		// присваиваем новое состояние
-		field = field2;
-
-		// Запускаем ф-цию отрисовки
-		drawField();
-
-		// увеличиваем счетчик
-		count++;
-
-		// Записываем в span (html) наш счетчик
-		countCycle.innerHTML = count + ' | ';
-
-		statusField = 0;
-		checkFieldEmpty();
-
-		countPoint.innerHTML = statusField;
-		randomStatus = 0; // отбой нашего рандома
-		
-		// таймер для отрисовки
-		let timer = setTimeout(startLife, speedGame.value); //Где 300 это период отрисовки
-	}
-	return;	
-}
-
-// учитываем выход за предел поля с верху
-function topField(i) {
-	if (i == 0) {
-		return fieldSquare;
-	}
-	return i;
-}
-
-// учитываем выход за предел поля с права
-function fpp(i) {
-	if (i == fieldSquare * 1 - 1) {
-		return -1; 
-	}
-	return i;
-}
-
-// Вешаем событие на кнопку
-document.getElementsByClassName('start')[0].onclick = startGame;
-document.getElementsByClassName('random')[0].onclick = randomFill;
-document.getElementsByClassName('pause')[0].onclick = pauseGame;
-
-document.getElementsByClassName('width')[0].onblur = fieldSize;
-document.getElementsByClassName('height')[0].onblur = fieldSize;
-
-/**/
-
-document.getElementsByClassName('width')[0].onkeypress = function (e) {
-  return false;
-};
-
-document.getElementsByClassName('height')[0].onkeypress = function (e) {
-  return false;
-};
-
-document.getElementsByClassName('speed')[0].onkeypress = function (e) {
-  return false;
-};
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "build";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./applications/app.js":
+/*!*****************************!*\
+  !*** ./applications/app.js ***!
+  \*****************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _view_view_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./view/view.js */ \"./applications/view/view.js\");\n/* jshint esversion: 6 */\r\n\r\n// точка входа, с которой начинается выполнение всей модели MVC\r\n// import Controller from './controller/controller.js';\r\n// const startGame = () => new Controller();\r\n// startGame();\r\n// export default startGame;\r\n\r\n// ---\r\n\r\n// import Model from './model.js';\r\n// import View from './view.js';\r\n// import Controller from './controller.js';\r\n\r\n// initializeGame(Model, View, Controller);\r\n\r\n// import {one, two} from './model/model.js';\r\n// import one from './model/model.js';\r\n// import two from './controller/controller.js';\r\n\r\n// alert(one);\r\n// alert(two);\r\n\r\n\r\nObject(_view_view_js__WEBPACK_IMPORTED_MODULE_0__[\"out\"])();\n\n//# sourceURL=webpack:///./applications/app.js?");
+
+/***/ }),
+
+/***/ "./applications/controller/controller.js":
+/*!***********************************************!*\
+  !*** ./applications/controller/controller.js ***!
+  \***********************************************/
+/*! exports provided: two, default, canvas, countCycle, countLife, countDead, pausePlay, start, countPoint, speedGame, fieldWidth, fieldHeight */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"two\", function() { return two; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return User; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"canvas\", function() { return canvas; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"countCycle\", function() { return countCycle; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"countLife\", function() { return countLife; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"countDead\", function() { return countDead; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"pausePlay\", function() { return pausePlay; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"start\", function() { return start; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"countPoint\", function() { return countPoint; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"speedGame\", function() { return speedGame; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"fieldWidth\", function() { return fieldWidth; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"fieldHeight\", function() { return fieldHeight; });\n/* jshint esversion: 6 */\r\n\r\n// Контроллер управляет запросами пользователя (получаемые в виде запросов \r\n// HTTP GET или POST, когда пользователь нажимает на элементы интерфейса \r\n// для выполнения различных действий). Его основная функция — вызывать и \r\n// координировать действие необходимых ресурсов и объектов, нужных для \r\n// выполнения действий, задаваемых пользователем. Обычно контроллер вызывает \r\n// соответствующую модель для задачи и выбирает подходящий вид.\r\n\r\n// import Model from './model.js';\r\n// import View from './view.js';\r\n\r\n// class Controller {\r\n\r\n//   constructor() {\r\n//     this._view = new View();\r\n//     this._gameStateListen();\r\n//     this._changeCellListen();\r\n//     this._unfocusInputsListen();\r\n\r\n//     this._model = new Model();\r\n//     this._model.createEmptyField();\r\n\r\n//     this._view.drawField(this._model.getHeight(), this._model.getWidth(), this._model.getCells());\r\n//   }\r\n// }\r\n\r\nlet two = 2;\r\n\r\nclass User {\r\n  constructor(name) {\r\n    this.name = name;\r\n    // return name;\r\n  }\r\n};\r\n\r\n// export {userTest};\r\n\r\n// ----------------------------------------------------------------------------\r\n\r\nconst canvas = document.getElementsByClassName('grid-gradient')[0];\r\n\r\nconst countCycle = document.getElementsByClassName('count__cycle')[0];\r\nconst countLife = document.getElementsByClassName('count__life')[0];\r\nconst countDead = document.getElementsByClassName('count__dead')[0];\r\nconst pausePlay = document.getElementsByClassName('pause')[0];\r\nconst start = document.getElementsByClassName('start')[0];\r\nconst countPoint = document.getElementsByClassName('count__point')[0];\r\nconst speedGame = document.getElementsByClassName('speed')[0];\r\n\r\nconst fieldWidth = document.getElementsByClassName('width')[0];\r\nconst fieldHeight = document.getElementsByClassName('height')[0];\r\n\r\n// ---\r\n\r\n// Вешаем на canvas событие click, где event указывает, что мы будем работать с событием\r\n// canvas.onclick = function(event) {\r\ncanvas.onclick = function clickMouseButton(event) {\r\n\t// Определим координату мыши относительно canvas\r\n\tlet x = event.offsetX;\r\n\tlet y = event.offsetY;\r\n\t\r\n\tconsole.log('offsetX: ' + x);\r\n\tconsole.log('offsetY: ' + y);\r\n\r\n\t// Поля от 0 до 10 будут принадлежать первому кубику, от 10 до 20 - 2му, и.т.д.\r\n\tx = Math.floor(x / pointSize); //300 / 10 = 30 кубиков, затем округляем в нижнюю сторону\r\n\ty = Math.floor(y / pointSize);\r\n\r\n\tconsole.log('X: ' + x);\r\n\tconsole.log('Y: ' + y);\r\n\t\r\n\tif (field[y][x] == 0) {\r\n\t\tfield[y][x] = 1; // Заполнение игрового поля, т.е. куда кликнем, там будет ЕДИНИЦА\r\n\t} else {\r\n\t\tfield[y][x] = 0;\r\n\t}\r\n\r\n\t// Проверяем\r\n\tconsole.log(field); //В начале и в конце будет 1, если тыкнуть на начало и конце поля\r\n\t// masTemp = mas;\t// подумать надо ли это или нет\r\n\r\n\tdrawField(); // Ф-ция которая будет отрисовывать точку при клике\t\t\r\n};\n\n//# sourceURL=webpack:///./applications/controller/controller.js?");
+
+/***/ }),
+
+/***/ "./applications/model/model.js":
+/*!*************************************!*\
+  !*** ./applications/model/model.js ***!
+  \*************************************/
+/*! exports provided: one, three */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"one\", function() { return one; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"three\", function() { return three; });\n/* harmony import */ var _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../controller/controller.js */ \"./applications/controller/controller.js\");\n/* jshint esversion: 6 */\r\n\r\n// Модель - это данные и правила, которые используются для работы с данными, \r\n// которые представляют концепцию управления приложением. В любом приложении \r\n// вся структура моделируется как данные, которые обрабатываются определённым \r\n// образом. Что такое пользователь для приложения — сообщение или книга? Только \r\n// данные, которые должны быть обработаны в соответствии с правилами (дата не \r\n// может указывать в будущее, e-mail должен быть в определённом формате, имя \r\n// не может быть длиннее Х символов, и так далее).\r\n\r\n// let one = 1;\r\n// let two = 2;\r\n\r\n// module.export = one;\r\n// module.export = two;\r\n\r\n\r\n\r\n\r\nlet one = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"two\"];\r\n\r\nlet three = new _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"default\"](\"Вася\");\r\n// export let two = 2;\r\n\r\n// ----------------------------------------------------------------------------\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"fieldWidth\"].value;\r\n_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].height = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"fieldHeight\"].value;\r\n\r\n// Объявляем контекст\r\nlet ctx = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].getContext('2d'); //Двумерный контекст для рисования\r\n\r\n// счетчики\r\nvar count = 0;\r\nvar counterLife = 0;\r\nvar counterDead = 0;\r\n\r\n// user data:\r\nvar pointSize = 10;\r\nvar fieldSquare = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width * 1 / pointSize * 1; // 300 / 10 = 30, т.е. массив будет 30х30\r\nvar randomStep = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width * 70 / 100; // для случаенного заполнения поля, см.: fieldSize()\r\n\r\nvar pausePlayStatus = 0;\r\nvar startSpeed = 0;\r\nvar statusField = 0; // 0 - поле пустое, если > 0 - на поле есть точки\r\nvar statusFieldReset = 0; // для кнопки RESET, 0 - кнопка НЕ была нажата, 1 - нажата.\r\nvar randomStatus = 0; // если рандомизируем игра НЕ сбрасывается, 0 - не рандомили, 1 - рандомили\r\nvar startStatus = 0; // 0 - старт, 1 - стоп\r\n// var resizeStatus = 0;\r\n\r\n// ---\r\n\r\n_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"pausePlay\"].disabled = true;\r\n\r\n// размер для клеточного поля, идет от размера квадратика, который ставиться при клике\r\n_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].style.backgroundSize = pointSize + 'px ' + pointSize + 'px';\r\n\r\n\r\nctx.fillStyle = '#00FF00'; // цвет квадратика\r\n\r\n// Создадим глобальный пустой массив (см. ниже)\r\nlet field = function field() {\r\n\tlet field = [];\r\n\treturn field;\r\n}\r\n\r\n// --------------------------------------------------------------------------------------\r\n\r\nfunction fieldSize() {\r\n\tif (_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"fieldWidth\"].value < _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"fieldHeight\"].value) { \r\n\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"fieldWidth\"].value = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"fieldHeight\"].value;\r\n\t}\r\n\r\n\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"fieldWidth\"].value;\r\n\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].height = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"fieldHeight\"].value;\r\n\r\n\tif (_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width > _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].height || _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width == _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].height) {\r\n\t\trandomStep = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width * 70 / 100;\r\n\t} else {\r\n\t\trandomStep = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].height * 70 / 100;\r\n\t\tconsole.log('randomStep: ' + randomStep);\r\n\t}\r\n\r\n\tfieldSquare = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width * 1 / pointSize * 1;\t\r\n\tlocation.reload();\t\r\n}\r\n\r\n// ---\r\n\r\nfunction goLife() {\r\n\tvar n = fieldSquare;\r\n\tvar m = fieldSquare;\r\n\tfor (var i = 0; i < m; i++) {\r\n\t\tfield[i] = []; // Объявляем пустой массив\r\n\r\n\t\t//для перебоки вышесозданного массива, т.е. создаем двумерный массив\r\n\t\tfor (var j = 0; j < n; j++) {\r\n\t\t\tfield[i][j] = 0;\r\n\t\t}\r\n\t}\r\n}\r\ngoLife(); //Запускаем наше игровое поле\r\n\r\n// ---\r\n\r\nfunction checkFieldEmpty() {\t\r\n\tfor (var i = 0; i < fieldSquare; i++) {\r\n\t\tfor (var j = 0; j < fieldSquare; j++) {\r\n\t\t\tif (field[i][j] != 0) {\r\n\t\t\t\tstatusField++;\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n\r\n\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"countPoint\"].innerHTML = statusField;\r\n}\r\n\r\n// ---\r\n\r\nfunction pauseGame() {\r\n\tif (pausePlayStatus == 0) {\r\n\t\tpausePlayStatus = 1;\t\r\n\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"pausePlay\"].innerHTML = 'Play';\r\n\r\n\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"start\"].disabled = true; // отрубаем нашу кнопку которая увеличивает скорость\r\n\t\t\r\n\t} else {\r\n\t\tpausePlayStatus = 0;\r\n\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"pausePlay\"].innerHTML = 'Pause';\r\n\r\n\t\tstartLife(); // в данном случае - продолжаем нашу игру\r\n\r\n\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"start\"].disabled = false; // включаем обратно\r\n\t}\t\r\n\r\n\t(pausePlayStatus == 0) ? console.log('play') : console.log('pause');\r\n}\r\n\r\n// ---\r\n\r\nfunction randomFill() {\t\t\r\n\trandomStatus = 1; // говорим, что мы нажали рандом\r\n\r\n\t// Очищаем массив каждый раз\r\n\tfor (var i = 0; i < fieldSquare; i++) {\r\n\t\tfor (var j = 0; j < fieldSquare; j++) {\t\t\t\r\n\t\t\tstatusField = 0;\r\n\t\t\tfield[i][j] = 0;\r\n\t\t}\r\n\t}\r\n\r\n\tctx.clearRect(0, 0, _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width, _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].height);\r\n\r\n\tvar max;\r\n\tvar min = 1;\r\n\r\n\t// Берем максимальное значение от ширины или высоты, смотря что больше.\r\n\tif (_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width > _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].height) {\r\n\t\tmax = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width;\t\t\r\n\t} else {\r\n\t\tmax = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].height;\r\n\t}\r\n\r\n\tif (_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width == _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].height) {\r\n\t\tmax = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width;\r\n\t} else { \r\n\t\tmax = _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"canvas\"].width;\r\n\t}\r\n\r\n\tfor (let i = 0; i < randomStep; i++) {\r\n\t\tvar randX = Math.round(Math.random() * (max - min) + min);\r\n\t\tvar randY = Math.round(Math.random() * (max - min) + min);\r\n\r\n\t\tvar x = randX;\r\n\t\tvar y = randY;\r\n\r\n\t\tx = Math.floor(x / pointSize);\r\n\t\ty = Math.floor(y / pointSize);\r\n\r\n\t\tfield[y][x] = 1; // Заполнение игрового поля сгенерированными рандомными числами\r\n\r\n\t\tdrawField();\r\n\t}\r\n}\r\n\r\n// ---\r\n\r\nfunction startGame() {\r\n\tif (startStatus == 0) {\r\n\t\tcheckFieldEmpty();\r\n\r\n\t\tif (statusField > 1) {\r\n\t\t\tstatusFieldReset = 0; // сначала надо сбросить наш RESET !!!\r\n\r\n\t\t\tstartLife();\r\n\t\t\t\r\n\t\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"pausePlay\"].disabled = false;\r\n\t\t} else {\r\n\t\t\talert('Нужно больше точек...');\r\n\t\t}\r\n\r\n\t\tstartStatus = 1;\r\n\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"start\"].innerHTML = 'Stop';\r\n\t\tconsole.log('startStatus: ' + startStatus);\r\n\t} else {\r\n\t\tresetGame();\r\n\r\n\t\tstartStatus = 0;\r\n\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"start\"].innerHTML = 'Start';\r\n\t}\r\n}\r\n\r\n// ---\r\n\r\nfunction resetGame() {\r\n\tpausePlayStatus = 1;\r\n\r\n\tgoLife();\r\n\tdrawField();\r\n\r\n\tcount = 0;\r\n\tcounterLife = 0;\r\n\tcounterDead = 0;\r\n\tpausePlayStatus = 0;\r\n\tstartSpeed = 0;\r\n\tstatusFieldReset = 1; // стопает цикл игры!!!\r\n\tstatusField = 0;\r\n\r\n\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"countCycle\"].innerHTML = count + ' | ';\r\n\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"countLife\"].innerHTML = counterLife  + ' | ';\r\n\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"countDead\"].innerHTML = counterDead + ' | ';\r\n\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"countPoint\"].innerHTML = statusField;\r\n\r\n\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"pausePlay\"].innerHTML = 'Pause';\r\n\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"pausePlay\"].disabled = true;\t\r\n\r\n\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"start\"].innerHTML = 'Play';\r\n\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"start\"].disabled = false;\r\n\r\n\tconsole.log('RESET: (statusFieldReset): ' + statusFieldReset);\r\n}\r\n\r\n// ---\r\n\r\nfunction startLife() {\r\n\tlet field2 = [];\r\n\tlet isAlive = [];\t\r\n\r\n\tif (pausePlayStatus == 0  && statusFieldReset == 0) {\t\t\r\n\t\tfor (let i = 0; i < fieldSquare; i++) {\t\t\t\r\n\t\t\tfield2[i] = [];\r\n\t\t\t// console.log('mas2:' + mas2);\r\n\t\t\tfor (let j = 0; j < fieldSquare; j++) {\t\t\t\t\r\n\t\t\t\t// мы должны посчитать кол-во соседей, нужно учесть что тут у нас встречаются\r\n\t\t\t\t// краевые условия\r\n\t\t\t\tlet neighbors = 0;\t\r\n\r\n\t\t\t\t// считаем соседей с верху + ф-цию см. ниже\r\n\t\t\t\tif (field[topField(i) - 1][j] == 1) neighbors++;\r\n\t\t\t\t// if (mas[i][j - 1] == 1) neighbors++;\r\n\r\n\t\t\t\t// считаем соседей с права\r\n\t\t\t\tif (field[i][fpp(j) + 1] == 1) neighbors++;\r\n\t\t\t\t// if (mas[i + 1][j] == 1) neighbors++;\r\n\r\n\t\t\t\t// сосед с низу\r\n\t\t\t\tif (field[fpp(i) + 1][j] == 1) neighbors++;\r\n\t\t\t\t// if (mas[i][j + 1] == 1) neighbors++;\r\n\r\n\t\t\t\t// сосед с лева\r\n\t\t\t\tif (field[i][topField(j) - 1] == 1) neighbors++;\r\n\t\t\t\t// if (mas[i - 1][j] == 1) neighbors++;\r\n\r\n\t\t\t\t// соседи по диагонали в право вверх /\r\n\t\t\t\tif (field[topField(i) - 1][fpp(j) + 1] == 1) neighbors++;\r\n\t\t\t\t// if (mas[i + 1][j - 1] == 1) neighbors++;\r\n\r\n\t\t\t\t// соседи по диагонали в право в низ \\\r\n\t\t\t\tif (field[fpp(i) + 1][fpp(j) + 1] == 1) neighbors++;\r\n\t\t\t\t// if (mas[i + 1][j + 1] == 1) neighbors++;\r\n\r\n\t\t\t\t// соседи по диагонали в лево в низ /\r\n\t\t\t\tif (field[fpp(i) + 1][topField(j) - 1] == 1) neighbors++;\r\n\t\t\t\t// if (mas[i - 1][j + 1] == 1) neighbors++;\r\n\r\n\t\t\t\t// соседи по диагонали в лево в верх \\\r\n\t\t\t\tif (field[topField(i) - 1][topField(j) - 1] == 1) neighbors++;\r\n\t\t\t\t// if (mas[i - 1][j - 1] == 1) neighbors++;\r\n\r\n/*\r\n * Распределение живых клеток в начале игры называется первым поколением. \r\n * Каждое следующее поколение рассчитывается на основе предыдущего по таким правилам:\r\n * \r\n * - в пустой (мёртвой) клетке, рядом с которой ровно три живые клетки, зарождается жизнь;\r\n * - если у живой клетки есть две или три живые соседки, то эта клетка продолжает жить; \r\n * в противном случае, если соседей меньше двух или больше трёх, клетка умирает \r\n * («от одиночества» или «от перенаселённости»)\r\n * \r\n * Игра прекращается, если\r\n * \r\n * - на поле не останется ни одной «живой» клетки\r\n * - конфигурация на очередном шаге в точности (без сдвигов и поворотов) повторит себя же \r\n * на одном из более ранних шагов (складывается периодическая конфигурация)\r\n * - при очередном шаге ни одна из клеток не меняет своего состояния \r\n * (складывается стабильная конфигурация; предыдущее правило, вырожденное до \r\n * одного шага назад)\r\n */\r\n\t\t\t\tisAlive = field[i][j]; // т.е. это текущее состояние с точками\r\n\r\n\t\t\t\t// проверка на соседей:\t\t\t\t\r\n\t\t\t\tif (isAlive == 0 && neighbors === 3) {\r\n\t\t\t\t\tfield2[i][j] = 1;\r\n\t\t\t\t\tcounterLife++;\r\n\t\t\t\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"countLife\"].innerHTML = counterLife  + ' | ';\r\n\t\t\t\t} else {\r\n\t\t\t\t\tif (isAlive == 1 && (neighbors === 3 || neighbors === 2)) {\r\n\t\t\t\t\t\tfield2[i][j] = 1; \r\n\t\t\t\t\t\tcounterLife++;\r\n\t\t\t\t\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"countLife\"].innerHTML = counterLife  + ' | ';\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tif (isAlive == 1 && neighbors > 3) {\r\n\t\t\t\t\t\t\tfield2[i][j] = 0;\r\n\t\t\t\t\t\t\tcounterDead++;\r\n\t\t\t\t\t\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"countDead\"].innerHTML = counterDead  + ' | ';\r\n\t\t\t\t\t\t} else {\r\n\t\t\t\t\t\t\tif (isAlive == 1 && neighbors < 2) {\r\n\t\t\t\t\t\t\t\tfield2[i][j] = 0;\r\n\t\t\t\t\t\t\t\tcounterDead++;\r\n\t\t\t\t\t\t\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"countDead\"].innerHTML = counterDead  + ' | ';\r\n\t\t\t\t\t\t\t} else { \r\n\t\t\t\t\t\t\t\tfield2[i][j] = 0; counterDead++;\r\n\t\t\t\t\t\t\t\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"countDead\"].innerHTML = counterDead + ' | ';\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\t// Проверка на наличие точек на поле\r\n\t\t\t\tif (statusField < 1 && randomStatus == 0) {\r\n\t\t\t\t\talert('GameOver man!. Все точки сдохли, плодиться не кому.');\t\t\t\t\t\r\n\r\n\t\t\t\t\tvar request = prompt('Введите: НЕТ - что бы остаться на страничке', '');\r\n\t\t\t\t\tswitch (request) {\r\n\t\t\t\t\t\tcase 'ДА': \r\n\t\t\t\t\t\t\tlocation.reload(); \r\n\t\t\t\t\t\t\tbreak;\r\n\r\n\t\t\t\t\t\tcase 'НЕТ': case 'Нет': case 'нет': case 'НеТ': \r\n\t\t\t\t\t\tcase 'НЕт': case 'неТ': case 'нЕт':\r\n\t\t\t\t\t\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"pausePlay\"].disabled = true;\r\n\t\t\t\t\t\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"start\"].disabled = true;\r\n\t\t\t\t\t\t\tbreak;\r\n\r\n\t\t\t\t\t\tdefault: \r\n\t\t\t\t\t\t\talert('Некорректное действие, страница будет перезагружена');\r\n\t\t\t\t\t\t\tlocation.reload(); // перезагрузки странички\r\n\t\t\t\t\t\t\tbreak;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t// присваиваем новое состояние\r\n\t\tfield = field2;\r\n\r\n\t\t// Запускаем ф-цию отрисовки\r\n\t\tdrawField();\r\n\r\n\t\t// увеличиваем счетчик\r\n\t\tcount++;\r\n\r\n\t\t// Записываем в span (html) наш счетчик\r\n\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"countCycle\"].innerHTML = count + ' | ';\r\n\r\n\t\tstatusField = 0;\r\n\t\tcheckFieldEmpty();\r\n\r\n\t\t_controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"countPoint\"].innerHTML = statusField;\r\n\t\trandomStatus = 0; // отбой нашего рандома\r\n\t\t\r\n\t\t// таймер для отрисовки\r\n\t\tlet timer = setTimeout(startLife, _controller_controller_js__WEBPACK_IMPORTED_MODULE_0__[\"speedGame\"].value); //Где 300 это период отрисовки\r\n\t}\r\n\treturn;\t\r\n}\r\n\r\n// ---\r\n\r\n// учитываем выход за предел поля с верху\r\nfunction topField(i) {\r\n\tif (i == 0) {\r\n\t\treturn fieldSquare;\r\n\t}\r\n\treturn i;\r\n}\r\n\r\n// учитываем выход за предел поля с права\r\nfunction fpp(i) {\r\n\tif (i == fieldSquare * 1 - 1) {\r\n\t\treturn -1; \r\n\t}\r\n\treturn i;\r\n}\r\n\r\n// ---\r\n\r\n\n\n//# sourceURL=webpack:///./applications/model/model.js?");
+
+/***/ }),
+
+/***/ "./applications/view/view.js":
+/*!***********************************!*\
+  !*** ./applications/view/view.js ***!
+  \***********************************/
+/*! exports provided: out */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"out\", function() { return out; });\n/* harmony import */ var _model_model_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../model/model.js */ \"./applications/model/model.js\");\n// Вид обеспечивает различные способы представления данных, которые получены из \r\n// модели. Он может быть шаблоном, который заполняется данными. Может быть \r\n// несколько различных видов, и контроллер выбирает, какой подходит наилучшим \r\n// образом для текущей ситуации.\r\n\r\n// Веб приложение обычно состоит из набора контроллеров, моделей и видов. \r\n// Контроллер может быть устроен как основной, который получает все запросы и \r\n// вызывает другие контроллеры для выполнения действий в зависимости от ситуации.\r\n\r\n// import {one} from './model/model.js';\r\n// console.log(one);\r\n\r\n\r\n\r\n\r\nfunction out() {\r\n  alert(_model_model_js__WEBPACK_IMPORTED_MODULE_0__[\"one\"]);\r\n  alert(_model_model_js__WEBPACK_IMPORTED_MODULE_0__[\"three\"]);\r\n}\r\n\r\n// ----------------------------------------------------------------------------\r\n\r\n//Ф-ция для отрисоки прямоугольников при клике\r\nfunction drawField() {\r\n\tctx.clearRect(0, 0, canvas.width, canvas.height); // Рисуем очищающий прямоугольник от 00(x,y) до 300(x,y)\r\n\r\n\t// Перебираем массив, и если какой то елемент = 1, то зарисовываем\r\n\tfor (var i = 0; i < fieldSquare; i++) {\t\t\t\t\r\n\t\tfor (var j = 0; j < fieldSquare; j++) {\r\n\t\t\t// условие проверки\r\n\t\t\tif (field[i][j] == 1) {\r\n\t\t\t\t// квадратик будет размером 10px(10, 10), если кликаем в первом поле, \r\n\t\t\t\t// координата должна быть от 0 до 10, если во втором поле от 10 до 20 и.т.д.\r\n\t\t\t\t// т.е. по сути это задает точку под указателем мышки при клике\r\n\t\t\t\tctx.fillRect(j * pointSize, i * pointSize, pointSize, pointSize); \t\t\t\t\r\n\t\t\t}\r\n\t\t\t// masSave[i] = mas[i]; // подумать надо ли это или нет\r\n\t\t}\r\n\t}\t\r\n}\r\n\r\n// ---\r\n\r\nfunction speed() {\r\n\tstartSpeed++;\r\n\tstart.innerHTML = 'speed: x' + startSpeed;\r\n}\r\n\r\n// ---\r\n\r\n\n\n//# sourceURL=webpack:///./applications/view/view.js?");
+
+/***/ }),
+
+/***/ 0:
+/*!***********************************!*\
+  !*** multi ./applications/app.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("module.exports = __webpack_require__(/*! ./applications/app.js */\"./applications/app.js\");\n\n\n//# sourceURL=webpack:///multi_./applications/app.js?");
+
+/***/ })
+
+/******/ });
