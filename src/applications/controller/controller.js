@@ -25,18 +25,80 @@
 //   }
 // }
 
-export let two = 2;
+// example: 1
+// export let two = 2;
 
-export default class User {
-  constructor(name) {
-    this.name = name;
-    // return name;
-  }
-};
+// // example: 2
+// export default class Task {
+//   constructor(name = Task.getDefaultTitle()) {
+// 		this.name = name;
+// 		this.done = false;
+// 		Task.count += 1; // инкремент, см. ниже статик св-во.
+// 		alert(this.name);	
+// 	} // тут ни , ни ; не ставятся
+	
+// 	// создаем методы, т.е. то, что объект будет уметь делать
+// 	complete() {
+// 		this.done = true;
+// 		console.log('task ' + this.name + ' exelent');
+// 	}
 
-// export {userTest};
+// 	countStatic() {
+// 		console.log(Task.count);
+// 	}
+
+// 	// статич. методы, пренадлежат самому классу а не объектам созданным на его основе.
+// 	// часто исп. для содания вспомогательных ф-ций
+// 	static getDefaultTitle() {
+// 		return 'Quest...';
+// 	}
+
+// 	// метод, связывает св-во объекта с ф-цией, которое будет вызываться при обращении к этому св-ву
+// 	get getDone() {
+// 		return this.done === true ? 'Executing' : 'NOT executing';
+// 	}
+
+// 	// set - принимает параметр, которому мы можем присвоить св-во.
+// 	set getDone(value) {
+// 		if(value !== undefined && typeof value === 'boolean') {
+// 			this.done = value;
+// 		} else {
+// 			console.error('Error');
+// 		}
+// 	}
+// }
+
+// // example 3: наследуемый класс
+// export class subTaskEx extends Task {
+// 	constructor(title) {
+// 		super(title); //  super используется для вызова функций, принадлежащих родителю объекта
+// 		console.log(title + ' creating subtasking...');		
+// 	}
+
+// 	// перезаписываем родительский метод		
+// 	complete() {
+// 		super.complete();
+// 		console.log('subtasking................');
+// 	}
+// }
+
+// let subtask = new subTaskEx('learn ES');
+// console.log(subtask);
+// subtask.complete();
+// console.log(subtask);
+
+// проверяем является ли объект task - представителем обоих классов
+// console.log(subtask instanceof subTask); // true
+// console.log(subtask instanceof Task); // true
+
+// ---
+
+// статич. сво-ва, пренадлежат самим классам, а не объектам созданных на его основе,
+// используются для хранения статической инф-ы,	объявляются ВСЕГДА за телом класса
+// Task.count = 0;
 
 // ----------------------------------------------------------------------------
+
 
 export const canvas = document.getElementsByClassName('grid-gradient')[0];
 
@@ -53,32 +115,25 @@ export const fieldHeight = document.getElementsByClassName('height')[0];
 
 // ---
 
-// Вешаем на canvas событие click, где event указывает, что мы будем работать с событием
-// canvas.onclick = function(event) {
-canvas.onclick = function clickMouseButton(event) {
-	// Определим координату мыши относительно canvas
-	let x = event.offsetX;
-	let y = event.offsetY;
-	
-	console.log('offsetX: ' + x);
-	console.log('offsetY: ' + y);
+// Вешаем событие на кнопку
+import {startGame, randomFill, pauseGame, fieldSize} from '../model/model.js';
+document.getElementsByClassName('start')[0].onclick = startGame;
+document.getElementsByClassName('random')[0].onclick = randomFill;
+document.getElementsByClassName('pause')[0].onclick = pauseGame;
 
-	// Поля от 0 до 10 будут принадлежать первому кубику, от 10 до 20 - 2му, и.т.д.
-	x = Math.floor(x / pointSize); //300 / 10 = 30 кубиков, затем округляем в нижнюю сторону
-	y = Math.floor(y / pointSize);
+document.getElementsByClassName('width')[0].onblur = fieldSize;
+document.getElementsByClassName('height')[0].onblur = fieldSize;
 
-	console.log('X: ' + x);
-	console.log('Y: ' + y);
-	
-	if (field[y][x] == 0) {
-		field[y][x] = 1; // Заполнение игрового поля, т.е. куда кликнем, там будет ЕДИНИЦА
-	} else {
-		field[y][x] = 0;
-	}
+/**/
 
-	// Проверяем
-	console.log(field); //В начале и в конце будет 1, если тыкнуть на начало и конце поля
-	// masTemp = mas;	// подумать надо ли это или нет
+document.getElementsByClassName('width')[0].onkeypress = function (e) {
+	return false;
+};
 
-	drawField(); // Ф-ция которая будет отрисовывать точку при клике		
+document.getElementsByClassName('height')[0].onkeypress = function (e) {
+	return false;
+};
+
+document.getElementsByClassName('speed')[0].onkeypress = function (e) {
+	return false;
 };

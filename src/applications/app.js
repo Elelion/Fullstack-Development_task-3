@@ -18,8 +18,19 @@
 // import one from './model/model.js';
 // import two from './controller/controller.js';
 
-// alert(one);
-// alert(two);
 
-import {out} from './view/view.js';
-out();
+// // example: 1
+// import {out} from './view/view.js';
+// out();
+
+
+// function Constructor(name) {
+// 	this.name = name;
+// 	alert(this.name);
+// }
+
+// Constructor('vasek');
+
+// ----------------------------------------------------------------------------
+
+import {buttonsEvents} from './view/view.js';

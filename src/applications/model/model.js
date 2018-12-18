@@ -8,18 +8,11 @@
 // может указывать в будущее, e-mail должен быть в определённом формате, имя 
 // не может быть длиннее Х символов, и так далее).
 
-// let one = 1;
-// let two = 2;
+// // example: 1
+// import {two} from '../controller/controller.js';
+// export let one = two;
 
-// module.export = one;
-// module.export = two;
-
-import {two} from '../controller/controller.js';
-import User from '../controller/controller.js';
-
-export let one = two;
-
-export let three = new User("Вася");
+// export let three = () => new User("vasya");
 // export let two = 2;
 
 // ----------------------------------------------------------------------------
@@ -34,12 +27,16 @@ import {countPoint} from '../controller/controller.js';
 import {speedGame} from '../controller/controller.js';
 import {fieldWidth} from '../controller/controller.js';
 import {fieldHeight} from '../controller/controller.js';
+import {drawField} from '../view/view.js';
 
-canvas.width = fieldWidth.value;
-canvas.height = fieldHeight.value;
+// export let canva = canvas;
+export let canvasModel = canvas;
+
+canvasModel.width = fieldWidth.value;
+canvasModel.height = fieldHeight.value;
 
 // Объявляем контекст
-let ctx = canvas.getContext('2d'); //Двумерный контекст для рисования
+export var ctx = canvasModel.getContext('2d'); //Двумерный контекст для рисования
 
 // счетчики
 var count = 0;
@@ -47,9 +44,9 @@ var counterLife = 0;
 var counterDead = 0;
 
 // user data:
-var pointSize = 10;
-var fieldSquare = canvas.width * 1 / pointSize * 1; // 300 / 10 = 30, т.е. массив будет 30х30
-var randomStep = canvas.width * 70 / 100; // для случаенного заполнения поля, см.: fieldSize()
+export let pointSize = 10; 
+export let fieldSquare = canvasModel.width * 1 / pointSize * 1; // 300 / 10 = 30, т.е. массив будет 30х30
+var randomStep = canvasModel.width * 70 / 100; // для случаенного заполнения поля, см.: fieldSize()
 
 var pausePlayStatus = 0;
 var startSpeed = 0;
@@ -64,35 +61,35 @@ var startStatus = 0; // 0 - старт, 1 - стоп
 pausePlay.disabled = true;
 
 // размер для клеточного поля, идет от размера квадратика, который ставиться при клике
-canvas.style.backgroundSize = pointSize + 'px ' + pointSize + 'px';
+canvasModel.style.backgroundSize = pointSize + 'px ' + pointSize + 'px';
 
 
 ctx.fillStyle = '#00FF00'; // цвет квадратика
 
 // Создадим глобальный пустой массив (см. ниже)
-let field = function field() {
+export let field = function field() {
 	let field = [];
 	return field;
 }
 
 // --------------------------------------------------------------------------------------
 
-function fieldSize() {
+export function fieldSize() {
 	if (fieldWidth.value < fieldHeight.value) { 
 		fieldWidth.value = fieldHeight.value;
 	}
 
-	canvas.width = fieldWidth.value;
-	canvas.height = fieldHeight.value;
+	canvasModel.width = fieldWidth.value;
+	canvasModel.height = fieldHeight.value;
 
-	if (canvas.width > canvas.height || canvas.width == canvas.height) {
-		randomStep = canvas.width * 70 / 100;
+	if (canvasModel.width > canvasModel.height || canvasModel.width == canvasModel.height) {
+		randomStep = canvasModel.width * 70 / 100;
 	} else {
-		randomStep = canvas.height * 70 / 100;
+		randomStep = canvasModel.height * 70 / 100;
 		console.log('randomStep: ' + randomStep);
 	}
 
-	fieldSquare = canvas.width * 1 / pointSize * 1;	
+	fieldSquare = canvasModel.width * 1 / pointSize * 1;	
 	location.reload();	
 }
 
@@ -128,7 +125,7 @@ function checkFieldEmpty() {
 
 // ---
 
-function pauseGame() {
+export function pauseGame() {
 	if (pausePlayStatus == 0) {
 		pausePlayStatus = 1;	
 		pausePlay.innerHTML = 'Play';
@@ -149,33 +146,33 @@ function pauseGame() {
 
 // ---
 
-function randomFill() {		
+export function randomFill() {		
 	randomStatus = 1; // говорим, что мы нажали рандом
 
 	// Очищаем массив каждый раз
-	for (var i = 0; i < fieldSquare; i++) {
-		for (var j = 0; j < fieldSquare; j++) {			
+	for (let i = 0; i < fieldSquare; i++) {
+		for (let j = 0; j < fieldSquare; j++) {			
 			statusField = 0;
 			field[i][j] = 0;
 		}
 	}
 
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.clearRect(0, 0, canvasModel.width, canvasModel.height);
 
-	var max;
-	var min = 1;
+	let max;
+	let min = 1;
 
 	// Берем максимальное значение от ширины или высоты, смотря что больше.
-	if (canvas.width > canvas.height) {
-		max = canvas.width;		
+	if (canvasModel.width > canvasModel.height) {
+		max = canvasModel.width;		
 	} else {
-		max = canvas.height;
+		max = canvasModel.height;
 	}
 
-	if (canvas.width == canvas.height) {
-		max = canvas.width;
+	if (canvasModel.width == canvasModel.height) {
+		max = canvasModel.width;
 	} else { 
-		max = canvas.width;
+		max = canvasModel.width;
 	}
 
 	for (let i = 0; i < randomStep; i++) {
@@ -196,7 +193,7 @@ function randomFill() {
 
 // ---
 
-function startGame() {
+export function startGame() {
 	if (startStatus == 0) {
 		checkFieldEmpty();
 
@@ -223,7 +220,7 @@ function startGame() {
 
 // ---
 
-function resetGame() {
+export function resetGame() {
 	pausePlayStatus = 1;
 
 	goLife();
@@ -417,3 +414,32 @@ function fpp(i) {
 
 // ---
 
+// Вешаем на canvas событие click, где event указывает, что мы будем работать с событием
+// canvas.onclick = function(event) {
+	canvasModel.onclick = function clickMouseButton(event) {
+	// Определим координату мыши относительно canvas
+	let x = event.offsetX;
+	let y = event.offsetY;
+	
+	console.log('offsetX: ' + x);
+	console.log('offsetY: ' + y);
+
+	// Поля от 0 до 10 будут принадлежать первому кубику, от 10 до 20 - 2му, и.т.д.
+	x = Math.floor(x / pointSize); //300 / 10 = 30 кубиков, затем округляем в нижнюю сторону
+	y = Math.floor(y / pointSize);
+
+	console.log('X: ' + x);
+	console.log('Y: ' + y);
+	
+	if (field[y][x] == 0) {
+		field[y][x] = 1; // Заполнение игрового поля, т.е. куда кликнем, там будет ЕДИНИЦА
+	} else {
+		field[y][x] = 0;
+	}
+
+	// Проверяем
+	console.log(field); //В начале и в конце будет 1, если тыкнуть на начало и конце поля
+	// masTemp = mas;	// подумать надо ли это или нет
+
+	drawField(); // Ф-ция которая будет отрисовывать точку при клике		
+};
