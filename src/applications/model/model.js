@@ -17,20 +17,26 @@
 
 // ----------------------------------------------------------------------------
 
-import {canvas} from '../controller/controller.js';
-import {countCycle} from '../controller/controller.js';
-import {countLife} from '../controller/controller.js';
-import {countDead} from '../controller/controller.js';
-import {pausePlay} from '../controller/controller.js';
-import {start} from '../controller/controller.js';
-import {countPoint} from '../controller/controller.js';
-import {speedGame} from '../controller/controller.js';
-import {fieldWidth} from '../controller/controller.js';
-import {fieldHeight} from '../controller/controller.js';
+import {
+	// canvas, 
+	userElements,
+	countCycle, 
+	countLife,
+	countDead,
+	pausePlay,
+	start,
+	countPoint,
+	speedGame,
+	fieldWidth,
+	fieldHeight
+} from '../controller/controller.js';
+
 import {drawField} from '../view/view.js';
 
-// export let canva = canvas;
-export let canvasModel = canvas;
+// ---
+
+let canvas = new userElements();
+export let canvasModel = canvas.getCanvasDOM;
 
 canvasModel.width = fieldWidth.value;
 canvasModel.height = fieldHeight.value;

@@ -100,6 +100,22 @@
 // ----------------------------------------------------------------------------
 
 
+export class userElements {
+ 	constructor() {
+ 		this.canvas = document.getElementsByClassName('grid-gradient')[0];
+	}
+
+	// is not function
+	get getCanvasDOM() {
+		return this.canvas;		
+	}
+
+	// function
+	complete() {
+		console.log(this.canvas + ' func');
+	}
+}
+
 export const canvas = document.getElementsByClassName('grid-gradient')[0];
 
 export const countCycle = document.getElementsByClassName('count__cycle')[0];
@@ -115,8 +131,20 @@ export const fieldHeight = document.getElementsByClassName('height')[0];
 
 // ---
 
+export class userDataOutput {
+	constructor() {
+		
+ }
+}
+
 // Вешаем событие на кнопку
-import {startGame, randomFill, pauseGame, fieldSize} from '../model/model.js';
+import {
+	startGame, 
+	randomFill, 
+	pauseGame, 
+	fieldSize
+} from '../model/model.js';
+
 document.getElementsByClassName('start')[0].onclick = startGame;
 document.getElementsByClassName('random')[0].onclick = randomFill;
 document.getElementsByClassName('pause')[0].onclick = pauseGame;
