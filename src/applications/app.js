@@ -33,4 +33,10 @@
 
 // ----------------------------------------------------------------------------
 
-import {buttonsEvents} from './view/view.js';
+// import {buttonsEvents} from './view/view.js';
+import {getEventsElementsDOM} from './controller/controller.js';
+let getEventsDOM = new getEventsElementsDOM();
+
+getEventsDOM.getDisabledInputWidth;
+getEventsDOM.getDisabledInputHeight;
+getEventsDOM.getDisabledInputSpeed;

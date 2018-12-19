@@ -17,32 +17,43 @@
 
 // ----------------------------------------------------------------------------
 
+import {drawField} from '../view/view.js';
+
 import {
 	// canvas, 
-	userElements,
-	countCycle, 
-	countLife,
-	countDead,
-	pausePlay,
-	start,
-	countPoint,
-	speedGame,
-	fieldWidth,
-	fieldHeight
+	// countCycle, 
+	// countLife,
+	// countDead,
+	// pausePlay,
+	// startStop,
+	// countPoint,
+	// speedGame,
+	// fieldWidth,
+	// fieldHeight
 } from '../controller/controller.js';
 
-import {drawField} from '../view/view.js';
+// get all the DOM's
+import {getElementsDOM} from '../controller/getElementsDOM.js';
 
 // ---
 
-let canvas = new userElements();
-export let canvasModel = canvas.getCanvasDOM;
+let getDOM = new getElementsDOM();
+let countCycle = getDOM.getCountCycleDOM;
+let countLife = getDOM.getCountLifeDOM;
+let countDead = getDOM.getCountDeadDOM;
+let pausePlay = getDOM.getPausePlayDOM;
+let startStop = getDOM.getStartStopDOM;
+let countPoint = getDOM.getCountPointDOM;
+let speedGame = getDOM.getSpeedGameDOM;
+let fieldWidth = getDOM.getFieldWidthDOM;
+let fieldHeight = getDOM.getFieldHeightDOM;
 
-canvasModel.width = fieldWidth.value;
-canvasModel.height = fieldHeight.value;
+// ---
 
-// Объявляем контекст
-export var ctx = canvasModel.getContext('2d'); //Двумерный контекст для рисования
+export let canvas = getDOM.getCanvasFieldDOM;
+canvas.width = fieldWidth.value;
+canvas.height = fieldHeight.value;
+export var ctx = canvas.getContext('2d'); // Объявляем Двумерный контекст для рисования
 
 // счетчики
 var count = 0;
@@ -51,8 +62,8 @@ var counterDead = 0;
 
 // user data:
 export let pointSize = 10; 
-export let fieldSquare = canvasModel.width * 1 / pointSize * 1; // 300 / 10 = 30, т.е. массив будет 30х30
-var randomStep = canvasModel.width * 70 / 100; // для случаенного заполнения поля, см.: fieldSize()
+export let fieldSquare = canvas.width * 1 / pointSize * 1; // 300 / 10 = 30, т.е. массив будет 30х30
+var randomStep = canvas.width * 70 / 100; // для случаенного заполнения поля, см.: fieldSize()
 
 var pausePlayStatus = 0;
 var startSpeed = 0;
@@ -67,7 +78,7 @@ var startStatus = 0; // 0 - старт, 1 - стоп
 pausePlay.disabled = true;
 
 // размер для клеточного поля, идет от размера квадратика, который ставиться при клике
-canvasModel.style.backgroundSize = pointSize + 'px ' + pointSize + 'px';
+canvas.style.backgroundSize = pointSize + 'px ' + pointSize + 'px';
 
 
 ctx.fillStyle = '#00FF00'; // цвет квадратика
@@ -85,17 +96,17 @@ export function fieldSize() {
 		fieldWidth.value = fieldHeight.value;
 	}
 
-	canvasModel.width = fieldWidth.value;
-	canvasModel.height = fieldHeight.value;
+	canvas.width = fieldWidth.value;
+	canvas.height = fieldHeight.value;
 
-	if (canvasModel.width > canvasModel.height || canvasModel.width == canvasModel.height) {
-		randomStep = canvasModel.width * 70 / 100;
+	if (canvas.width > canvas.height || canvas.width == canvas.height) {
+		randomStep = canvas.width * 70 / 100;
 	} else {
-		randomStep = canvasModel.height * 70 / 100;
+		randomStep = canvas.height * 70 / 100;
 		console.log('randomStep: ' + randomStep);
 	}
 
-	fieldSquare = canvasModel.width * 1 / pointSize * 1;	
+	fieldSquare = canvas.width * 1 / pointSize * 1;	
 	location.reload();	
 }
 
@@ -163,22 +174,22 @@ export function randomFill() {
 		}
 	}
 
-	ctx.clearRect(0, 0, canvasModel.width, canvasModel.height);
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	let max;
 	let min = 1;
 
 	// Берем максимальное значение от ширины или высоты, смотря что больше.
-	if (canvasModel.width > canvasModel.height) {
-		max = canvasModel.width;		
+	if (canvas.width > canvas.height) {
+		max = canvas.width;		
 	} else {
-		max = canvasModel.height;
+		max = canvas.height;
 	}
 
-	if (canvasModel.width == canvasModel.height) {
-		max = canvasModel.width;
+	if (canvas.width == canvas.height) {
+		max = canvas.width;
 	} else { 
-		max = canvasModel.width;
+		max = canvas.width;
 	}
 
 	for (let i = 0; i < randomStep; i++) {
@@ -214,13 +225,13 @@ export function startGame() {
 		}
 
 		startStatus = 1;
-		start.innerHTML = 'Stop';
+		startStop.innerHTML = 'Stop';
 		console.log('startStatus: ' + startStatus);
 	} else {
 		resetGame();
 
 		startStatus = 0;
-		start.innerHTML = 'Start';
+		startStop.innerHTML = 'Start';
 	}
 }
 
@@ -248,8 +259,8 @@ export function resetGame() {
 	pausePlay.innerHTML = 'Pause';
 	pausePlay.disabled = true;	
 
-	start.innerHTML = 'Play';
-	start.disabled = false;
+	startStop.innerHTML = 'Play';
+	startStop.disabled = false;
 
 	console.log('RESET: (statusFieldReset): ' + statusFieldReset);
 }
@@ -362,7 +373,7 @@ function startLife() {
 						case 'НЕТ': case 'Нет': case 'нет': case 'НеТ': 
 						case 'НЕт': case 'неТ': case 'нЕт':
 							pausePlay.disabled = true;
-							start.disabled = true;
+							startStop.disabled = true;
 							break;
 
 						default: 
@@ -422,7 +433,7 @@ function fpp(i) {
 
 // Вешаем на canvas событие click, где event указывает, что мы будем работать с событием
 // canvas.onclick = function(event) {
-	canvasModel.onclick = function clickMouseButton(event) {
+	canvas.onclick = function clickMouseButton(event) {
 	// Определим координату мыши относительно canvas
 	let x = event.offsetX;
 	let y = event.offsetY;

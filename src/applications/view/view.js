@@ -40,7 +40,7 @@
 
 // ----------------------------------------------------------------------------
 
-import {canvasModel as canvas} from '../model/model.js';
+import {canvas} from '../model/model.js';
 import {ctx} from '../model/model.js';
 import {field} from '../model/model.js';
 import {fieldSquare} from '../model/model.js';

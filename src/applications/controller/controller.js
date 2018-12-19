@@ -60,7 +60,7 @@
 
 // 	// set - принимает параметр, которому мы можем присвоить св-во.
 // 	set getDone(value) {
-// 		if(value !== undefined && typeof value === 'boolean') {
+// 		if (value !== undefined && typeof value === 'boolean') {
 // 			this.done = value;
 // 		} else {
 // 			console.error('Error');
@@ -99,69 +99,39 @@
 
 // ----------------------------------------------------------------------------
 
-
-export class userElements {
- 	constructor() {
- 		this.canvas = document.getElementsByClassName('grid-gradient')[0];
-	}
-
-	// is not function
-	get getCanvasDOM() {
-		return this.canvas;		
-	}
-
-	// function
-	complete() {
-		console.log(this.canvas + ' func');
-	}
-}
-
-export const canvas = document.getElementsByClassName('grid-gradient')[0];
-
-export const countCycle = document.getElementsByClassName('count__cycle')[0];
-export const countLife = document.getElementsByClassName('count__life')[0];
-export const countDead = document.getElementsByClassName('count__dead')[0];
-export const pausePlay = document.getElementsByClassName('pause')[0];
-export const start = document.getElementsByClassName('start')[0];
-export const countPoint = document.getElementsByClassName('count__point')[0];
-export const speedGame = document.getElementsByClassName('speed')[0];
-
-export const fieldWidth = document.getElementsByClassName('width')[0];
-export const fieldHeight = document.getElementsByClassName('height')[0];
-
-// ---
-
-export class userDataOutput {
-	constructor() {
-		
- }
-}
-
-// Вешаем событие на кнопку
 import {
 	startGame, 
 	randomFill, 
 	pauseGame, 
 	fieldSize
-} from '../model/model.js';
+} from '../model/model.js';		
 
-document.getElementsByClassName('start')[0].onclick = startGame;
-document.getElementsByClassName('random')[0].onclick = randomFill;
-document.getElementsByClassName('pause')[0].onclick = pauseGame;
+export class getEventsElementsDOM {
+	constructor() {
+		// We hang the event on the buttons
+		this.buttonStart = document.getElementsByClassName('start')[0].onclick = startGame;
+		this.buttonRandom = document.getElementsByClassName('random')[0].onclick = randomFill;
+		this.buttonPausePlay = document.getElementsByClassName('pause')[0].onclick = pauseGame;
 
-document.getElementsByClassName('width')[0].onblur = fieldSize;
-document.getElementsByClassName('height')[0].onblur = fieldSize;
+		this.inputFieldWidth = document.getElementsByClassName('width')[0].onclick = fieldSize;
+		this.inputFieldHeight = document.getElementsByClassName('height')[0].onclick = fieldSize;
+	}		
 
-/**/
+	get getDisabledInputWidth() {
+		document.getElementsByClassName('width')[0].onkeypress = function (e) {
+			return false;
+		};
+	}
 
-document.getElementsByClassName('width')[0].onkeypress = function (e) {
-	return false;
-};
+	get getDisabledInputHeight() {
+		document.getElementsByClassName('height')[0].onkeypress = function (e) {
+			return false;
+		};
+	}
 
-document.getElementsByClassName('height')[0].onkeypress = function (e) {
-	return false;
-};
-
-document.getElementsByClassName('speed')[0].onkeypress = function (e) {
-	return false;
-};
+	get getDisabledInputSpeed() {
+		document.getElementsByClassName('speed')[0].onkeypress = function (e) {
+			return false;
+		};
+	}
+}
