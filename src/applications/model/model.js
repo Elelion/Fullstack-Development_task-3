@@ -3,7 +3,7 @@
 // Модель - это данные и правила, которые используются для работы с данными, 
 // которые представляют концепцию управления приложением. В любом приложении 
 // вся структура моделируется как данные, которые обрабатываются определённым 
-// образом. Что такое пользователь для приложения — сообщение или книга? Только 
+// образом. Что такое пользователь для приложения — сообщение или книга? Только
 // данные, которые должны быть обработаны в соответствии с правилами (дата не 
 // может указывать в будущее, e-mail должен быть в определённом формате, имя 
 // не может быть длиннее Х символов, и так далее).
@@ -17,22 +17,7 @@
 
 // ----------------------------------------------------------------------------
 
-import {drawField} from '../view/view.js';
-
-import {
-	// canvas, 
-	// countCycle, 
-	// countLife,
-	// countDead,
-	// pausePlay,
-	// startStop,
-	// countPoint,
-	// speedGame,
-	// fieldWidth,
-	// fieldHeight
-} from '../controller/controller.js';
-
-// get all the DOM's
+import {drawField} from '../view/DrawField.js';
 import {getElementsDOM} from '../controller/getElementsDOM.js';
 
 // ---
@@ -48,42 +33,44 @@ let speedGame = getDOM.getSpeedGameDOM;
 let fieldWidth = getDOM.getFieldWidthDOM;
 let fieldHeight = getDOM.getFieldHeightDOM;
 
-// ---
-
 export let canvas = getDOM.getCanvasFieldDOM;
 canvas.width = fieldWidth.value;
 canvas.height = fieldHeight.value;
-export var ctx = canvas.getContext('2d'); // Объявляем Двумерный контекст для рисования
 
-// счетчики
+// NOTE: ctx = ConTeXt
+export var ctx = canvas.getContext('2d');
+
 var count = 0;
 var counterLife = 0;
 var counterDead = 0;
 
-// user data:
+/**
+ * NOTE:
+ * statusField: 0 - empty field, if > 0 - on field have a points
+ * statusFieldReset: for button RESET, 0 - button NOT pressed, 1 - pressed
+ * randomStatus: for random points, 0 - not be randoming, 1 - randoming
+ * startStatus: 0 - start, 1 - stop
+ */
+var pausePlayStatus = 0;
+var startSpeed = 0; // FIXME: is there a need?
+var statusField = 0;
+var statusFieldReset = 0;
+var randomStatus = 0;
+var startStatus = 0;
+
 export let pointSize = 10; 
 export let fieldSquare = canvas.width * 1 / pointSize * 1; // 300 / 10 = 30, т.е. массив будет 30х30
 var randomStep = canvas.width * 70 / 100; // для случаенного заполнения поля, см.: fieldSize()
-
-var pausePlayStatus = 0;
-var startSpeed = 0;
-var statusField = 0; // 0 - поле пустое, если > 0 - на поле есть точки
-var statusFieldReset = 0; // для кнопки RESET, 0 - кнопка НЕ была нажата, 1 - нажата.
-var randomStatus = 0; // если рандомизируем игра НЕ сбрасывается, 0 - не рандомили, 1 - рандомили
-var startStatus = 0; // 0 - старт, 1 - стоп
-// var resizeStatus = 0;
+// var resizeStatus = 0; // FIXME: is there a need?
 
 // ---
 
 pausePlay.disabled = true;
-
 // размер для клеточного поля, идет от размера квадратика, который ставиться при клике
 canvas.style.backgroundSize = pointSize + 'px ' + pointSize + 'px';
-
-
 ctx.fillStyle = '#00FF00'; // цвет квадратика
 
-// Создадим глобальный пустой массив (см. ниже)
+// Creating global empty array
 export let field = function field() {
 	let field = [];
 	return field;

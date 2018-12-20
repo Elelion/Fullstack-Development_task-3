@@ -34,7 +34,7 @@
 // ----------------------------------------------------------------------------
 
 // import {buttonsEvents} from './view/view.js';
-import {getEventsElementsDOM} from './controller/controller.js';
+import {getEventsElementsDOM} from './controller/getEventsElementsDOM.js';
 let getEventsDOM = new getEventsElementsDOM();
 
 getEventsDOM.getDisabledInputWidth;

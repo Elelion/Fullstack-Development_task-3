@@ -1,3 +1,5 @@
+/* jshint esversion: 6 */
+
 // Вид обеспечивает различные способы представления данных, которые получены из 
 // модели. Он может быть шаблоном, который заполняется данными. Может быть 
 // несколько различных видов, и контроллер выбирает, какой подходит наилучшим 
@@ -40,37 +42,41 @@
 
 // ----------------------------------------------------------------------------
 
-import {canvas} from '../model/model.js';
-import {ctx} from '../model/model.js';
-import {field} from '../model/model.js';
-import {fieldSquare} from '../model/model.js';
-import {pointSize} from '../model/model.js';
+import {
+	canvas,
+	ctx,
+	field,
+	fieldSquare,
+	pointSize
+} from '../model/model.js';
 
-//Ф-ция для отрисоки прямоугольников при клике
-export function drawField() {
-	ctx.clearRect(0, 0, canvas.width, canvas.height); // Рисуем очищающий прямоугольник от 00(x,y) до 300(x,y)
+// NOTE: Function to draw rectangles on click
+export function drawField() {	
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	pointDraw();		
 
-	// Перебираем массив, и если какой то елемент = 1, то зарисовываем
-	for (var i = 0; i < fieldSquare; i++) {				
-		for (var j = 0; j < fieldSquare; j++) {
-			// условие проверки
-			if (field[i][j] == 1) {
-				// квадратик будет размером 10px(10, 10), если кликаем в первом поле, 
-				// координата должна быть от 0 до 10, если во втором поле от 10 до 20 и.т.д.
-				// т.е. по сути это задает точку под указателем мышки при клике
-				ctx.fillRect(j * pointSize, i * pointSize, pointSize, pointSize); 				
+	/**
+	 * NOTE:
+	 * Iterate over the array, and if some element = 1, then draw
+	 * point will have a size 10x10px, if be clicked in first field
+	 * coordinates must be from 0 to 10 if second field is from 10 to 20, etc 
+	 * that is, in fact it sets a point under the mouse pointer when you click
+	 */
+	function pointDraw() {
+		for (let i = 0; i < fieldSquare; i++) {
+			for (let j = 0; j < fieldSquare; j++) {
+				if (field[i][j] == 1) {
+					ctx.fillRect(j * pointSize, i * pointSize, pointSize, pointSize);
+				}
 			}
-			// masSave[i] = mas[i]; // подумать надо ли это или нет
-		}
-	}	
+		}	
+	}
 }
 
 // ---
 
+// FIXME: is there a need?
 // function speed() {
 // 	startSpeed++;
 // 	start.innerHTML = 'speed: x' + startSpeed;
 // }
-
-// ---
-

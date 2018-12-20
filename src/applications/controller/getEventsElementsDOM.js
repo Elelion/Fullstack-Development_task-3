@@ -108,13 +108,21 @@ import {
 
 export class getEventsElementsDOM {
 	constructor() {
-		// We hang the event on the buttons
-		this.buttonStart = document.getElementsByClassName('start')[0].onclick = startGame;
-		this.buttonRandom = document.getElementsByClassName('random')[0].onclick = randomFill;
-		this.buttonPausePlay = document.getElementsByClassName('pause')[0].onclick = pauseGame;
+		// Events for the buttons
+		this.buttonStart = 
+			document.getElementsByClassName('start')[0].onclick = startGame;
 
-		this.inputFieldWidth = document.getElementsByClassName('width')[0].onclick = fieldSize;
-		this.inputFieldHeight = document.getElementsByClassName('height')[0].onclick = fieldSize;
+		this.buttonRandom = 
+			document.getElementsByClassName('random')[0].onclick = randomFill;
+
+		this.buttonPausePlay = 
+			document.getElementsByClassName('pause')[0].onclick = pauseGame;
+
+		this.inputFieldWidth = 
+			document.getElementsByClassName('width')[0].onclick = fieldSize;
+
+		this.inputFieldHeight = 
+			document.getElementsByClassName('height')[0].onclick = fieldSize;
 	}		
 
 	get getDisabledInputWidth() {
