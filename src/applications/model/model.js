@@ -8,19 +8,10 @@
 // может указывать в будущее, e-mail должен быть в определённом формате, имя 
 // не может быть длиннее Х символов, и так далее).
 
-// // example: 1
-// import {two} from '../controller/controller.js';
-// export let one = two;
-
-// export let three = () => new User("vasya");
-// export let two = 2;
-
-// ----------------------------------------------------------------------------
+// ---
 
 import {drawField} from '../view/DrawField.js';
 import {getElementsDOM} from '../controller/getElementsDOM.js';
-
-// ---
 
 let getDOM = new getElementsDOM();
 let countCycle = getDOM.getCountCycleDOM;
@@ -32,17 +23,17 @@ let countPoint = getDOM.getCountPointDOM;
 let speedGame = getDOM.getSpeedGameDOM;
 let fieldWidth = getDOM.getFieldWidthDOM;
 let fieldHeight = getDOM.getFieldHeightDOM;
-
 export let canvas = getDOM.getCanvasFieldDOM;
+
 canvas.width = fieldWidth.value;
 canvas.height = fieldHeight.value;
 
 // NOTE: ctx = ConTeXt
-export var ctx = canvas.getContext('2d');
+export let ctx = canvas.getContext('2d');
 
-var count = 0;
-var counterLife = 0;
-var counterDead = 0;
+let count = 0;
+let counterLife = 0;
+let counterDead = 0;
 
 /**
  * NOTE:
@@ -51,32 +42,41 @@ var counterDead = 0;
  * randomStatus: for random points, 0 - not be randoming, 1 - randoming
  * startStatus: 0 - start, 1 - stop
  */
-var pausePlayStatus = 0;
-var startSpeed = 0; // FIXME: is there a need?
-var statusField = 0;
-var statusFieldReset = 0;
-var randomStatus = 0;
-var startStatus = 0;
+let pausePlayStatus = 0;
+let statusField = 0;
+let statusFieldReset = 0;
+let randomStatus = 0;
+let startStatus = 0;
+
+// FIXME: think... is there a need?
+// var startSpeed = 0;
 
 export let pointSize = 10; 
-export let fieldSquare = canvas.width * 1 / pointSize * 1; // 300 / 10 = 30, т.е. массив будет 30х30
-var randomStep = canvas.width * 70 / 100; // для случаенного заполнения поля, см.: fieldSize()
-// var resizeStatus = 0; // FIXME: is there a need?
 
-// ---
+// NOTE: 300 / 10 = 30, it is array will have 30х30
+export let fieldSquare = canvas.width * 1 / pointSize * 1;
 
-pausePlay.disabled = true;
-// размер для клеточного поля, идет от размера квадратика, который ставиться при клике
+// NOTE: for randoming field filling, lookup: fieldSize()
+let randomStep = canvas.width * 70 / 100;
+
+/**
+ * NOTE:
+ * the size for the cell field, comes from the size of the square, 
+ * which is put when you click
+ * ctx.fillStyle - color for square
+ */
 canvas.style.backgroundSize = pointSize + 'px ' + pointSize + 'px';
-ctx.fillStyle = '#00FF00'; // цвет квадратика
+ctx.fillStyle = '#00FF00';
+pausePlay.disabled = true;
+// TODO: think of random colors...
 
-// Creating global empty array
+// NOTE: creating global empty array, our field for points
 export let field = function field() {
 	let field = [];
 	return field;
 }
 
-// --------------------------------------------------------------------------------------
+// ---
 
 export function fieldSize() {
 	if (fieldWidth.value < fieldHeight.value) { 
@@ -99,25 +99,22 @@ export function fieldSize() {
 
 // ---
 
-function goLife() {
-	var n = fieldSquare;
-	var m = fieldSquare;
-	for (var i = 0; i < m; i++) {
-		field[i] = []; // Объявляем пустой массив
+function clearField() {	
+	for (let i = 0; i < fieldSquare; i++) {
+		field[i] = [];
 
-		//для перебоки вышесозданного массива, т.е. создаем двумерный массив
-		for (var j = 0; j < n; j++) {
+		for (let j = 0; j < fieldSquare; j++) {
 			field[i][j] = 0;
 		}
 	}
 }
-goLife(); //Запускаем наше игровое поле
+clearField();
 
 // ---
 
-function checkFieldEmpty() {	
-	for (var i = 0; i < fieldSquare; i++) {
-		for (var j = 0; j < fieldSquare; j++) {
+function checkEmptyField() {	
+	for (let i = 0; i < fieldSquare; i++) {
+		for (let j = 0; j < fieldSquare; j++) {
 			if (field[i][j] != 0) {
 				statusField++;
 			}
@@ -134,15 +131,14 @@ export function pauseGame() {
 		pausePlayStatus = 1;	
 		pausePlay.innerHTML = 'Play';
 
-		start.disabled = true; // отрубаем нашу кнопку которая увеличивает скорость
-		
+		start.disabled = true;
 	} else {
 		pausePlayStatus = 0;
 		pausePlay.innerHTML = 'Pause';
 
-		startLife(); // в данном случае - продолжаем нашу игру
-
-		start.disabled = false; // включаем обратно
+		// NOTE: in this case - continue our game
+		startLife();
+		start.disabled = false;
 	}	
 
 	(pausePlayStatus == 0) ? console.log('play') : console.log('pause');
@@ -150,48 +146,54 @@ export function pauseGame() {
 
 // ---
 
-export function randomFill() {		
-	randomStatus = 1; // говорим, что мы нажали рандом
+export function randomFill() {			
+	getClearFieldBeforeRandom();
+	randomStatus = 1;
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	
+	let max = getMaxFieldSize();
+	let min = 1;
+	getRandomGenerated();
 
-	// Очищаем массив каждый раз
-	for (let i = 0; i < fieldSquare; i++) {
-		for (let j = 0; j < fieldSquare; j++) {			
-			statusField = 0;
-			field[i][j] = 0;
+	// NOTE: clear field
+	function getClearFieldBeforeRandom() {
+		for (let i = 0; i < fieldSquare; i++) {
+			for (let j = 0; j < fieldSquare; j++) {			
+				statusField = 0;
+				field[i][j] = 0;
+			}
 		}
 	}
 
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	// NOTE: filling the playing field with randomly generated numbers
+	function getRandomGenerated() {	
+		for (let i = 0; i < randomStep; i++) {
+			let randX = Math.round(Math.random() * (max - min) + min);
+			let randY = Math.round(Math.random() * (max - min) + min);
+			randX = Math.floor(randX / pointSize);
+			randY = Math.floor(randY / pointSize);
 
-	let max;
-	let min = 1;
-
-	// Берем максимальное значение от ширины или высоты, смотря что больше.
-	if (canvas.width > canvas.height) {
-		max = canvas.width;		
-	} else {
-		max = canvas.height;
+			field[randY][randX] = 1;
+			drawField();
+		}
 	}
 
-	if (canvas.width == canvas.height) {
-		max = canvas.width;
-	} else { 
-		max = canvas.width;
-	}
+	// NOTE: take the maximum value of the width or height, whichever is greater
+	function getMaxFieldSize() {
+		let max = 0;
 
-	for (let i = 0; i < randomStep; i++) {
-		var randX = Math.round(Math.random() * (max - min) + min);
-		var randY = Math.round(Math.random() * (max - min) + min);
+		if (canvas.width > canvas.height) {
+			max = canvas.width;		
+		} else {
+			max = canvas.height;
+		}
 
-		var x = randX;
-		var y = randY;
-
-		x = Math.floor(x / pointSize);
-		y = Math.floor(y / pointSize);
-
-		field[y][x] = 1; // Заполнение игрового поля сгенерированными рандомными числами
-
-		drawField();
+		if (canvas.width == canvas.height) {
+			max = canvas.width;
+		} else { 
+			max = canvas.width;
+		}	
+		return max;
 	}
 }
 
@@ -199,16 +201,16 @@ export function randomFill() {
 
 export function startGame() {
 	if (startStatus == 0) {
-		checkFieldEmpty();
+		checkEmptyField();
 
 		if (statusField > 1) {
-			statusFieldReset = 0; // сначала надо сбросить наш RESET !!!
+			statusFieldReset = 0;			
+			pausePlay.disabled = false;
 
 			startLife();
-			
-			pausePlay.disabled = false;
 		} else {
 			alert('Нужно больше точек...');
+			return;
 		}
 
 		startStatus = 1;
@@ -225,29 +227,29 @@ export function startGame() {
 // ---
 
 export function resetGame() {
-	pausePlayStatus = 1;
-
-	goLife();
-	drawField();
-
 	count = 0;
 	counterLife = 0;
 	counterDead = 0;
-	pausePlayStatus = 0;
-	startSpeed = 0;
-	statusFieldReset = 1; // стопает цикл игры!!!
+	pausePlayStatus = 0;	
 	statusField = 0;
+	// startSpeed = 0;
 
+	// NOTE: stops the game cycle
+	statusFieldReset = 1;
+	pausePlayStatus = 1;		
+
+	pausePlay.innerHTML = 'Pause';
+	startStop.innerHTML = 'Play';
 	countCycle.innerHTML = count + ' | ';
 	countLife.innerHTML = counterLife  + ' | ';
 	countDead.innerHTML = counterDead + ' | ';
-	countPoint.innerHTML = statusField;
-
-	pausePlay.innerHTML = 'Pause';
-	pausePlay.disabled = true;	
-
-	startStop.innerHTML = 'Play';
+	countPoint.innerHTML = statusField;	
+	
+	pausePlay.disabled = true;
 	startStop.disabled = false;
+
+	clearField();
+	drawField();
 
 	console.log('RESET: (statusFieldReset): ' + statusFieldReset);
 }
@@ -255,51 +257,50 @@ export function resetGame() {
 // ---
 
 function startLife() {
-	let field2 = [];
-	let isAlive = [];	
+	let fieldTemp = [];
+	let isAlive = [];		
 
 	if (pausePlayStatus == 0  && statusFieldReset == 0) {		
 		for (let i = 0; i < fieldSquare; i++) {			
-			field2[i] = [];
-			// console.log('mas2:' + mas2);
+			fieldTemp[i] = [];			
 			for (let j = 0; j < fieldSquare; j++) {				
 				// мы должны посчитать кол-во соседей, нужно учесть что тут у нас встречаются
 				// краевые условия
-				let neighbors = 0;	
+				let neighbors = 0;
 
 				// считаем соседей с верху + ф-цию см. ниже
-				if (field[topField(i) - 1][j] == 1) neighbors++;
+				if (field[topFieldOut(i) - 1][j] == 1) neighbors++;
 				// if (mas[i][j - 1] == 1) neighbors++;
 
 				// считаем соседей с права
-				if (field[i][fpp(j) + 1] == 1) neighbors++;
+				if (field[i][rightFieldOut(j) + 1] == 1) neighbors++;
 				// if (mas[i + 1][j] == 1) neighbors++;
 
 				// сосед с низу
-				if (field[fpp(i) + 1][j] == 1) neighbors++;
+				if (field[rightFieldOut(i) + 1][j] == 1) neighbors++;
 				// if (mas[i][j + 1] == 1) neighbors++;
 
 				// сосед с лева
-				if (field[i][topField(j) - 1] == 1) neighbors++;
+				if (field[i][topFieldOut(j) - 1] == 1) neighbors++;
 				// if (mas[i - 1][j] == 1) neighbors++;
 
 				// соседи по диагонали в право вверх /
-				if (field[topField(i) - 1][fpp(j) + 1] == 1) neighbors++;
+				if (field[topFieldOut(i) - 1][rightFieldOut(j) + 1] == 1) neighbors++;
 				// if (mas[i + 1][j - 1] == 1) neighbors++;
 
 				// соседи по диагонали в право в низ \
-				if (field[fpp(i) + 1][fpp(j) + 1] == 1) neighbors++;
+				if (field[rightFieldOut(i) + 1][rightFieldOut(j) + 1] == 1) neighbors++;
 				// if (mas[i + 1][j + 1] == 1) neighbors++;
 
 				// соседи по диагонали в лево в низ /
-				if (field[fpp(i) + 1][topField(j) - 1] == 1) neighbors++;
+				if (field[rightFieldOut(i) + 1][topFieldOut(j) - 1] == 1) neighbors++;
 				// if (mas[i - 1][j + 1] == 1) neighbors++;
 
 				// соседи по диагонали в лево в верх \
-				if (field[topField(i) - 1][topField(j) - 1] == 1) neighbors++;
+				if (field[topFieldOut(i) - 1][topFieldOut(j) - 1] == 1) neighbors++;
 				// if (mas[i - 1][j - 1] == 1) neighbors++;
 
-/*
+/**
  * Распределение живых клеток в начале игры называется первым поколением. 
  * Каждое следующее поколение рассчитывается на основе предыдущего по таким правилам:
  * 
@@ -319,33 +320,8 @@ function startLife() {
  */
 				isAlive = field[i][j]; // т.е. это текущее состояние с точками
 
-				// проверка на соседей:				
-				if (isAlive == 0 && neighbors === 3) {
-					field2[i][j] = 1;
-					counterLife++;
-					countLife.innerHTML = counterLife  + ' | ';
-				} else {
-					if (isAlive == 1 && (neighbors === 3 || neighbors === 2)) {
-						field2[i][j] = 1; 
-						counterLife++;
-						countLife.innerHTML = counterLife  + ' | ';
-					} else {
-						if (isAlive == 1 && neighbors > 3) {
-							field2[i][j] = 0;
-							counterDead++;
-							countDead.innerHTML = counterDead  + ' | ';
-						} else {
-							if (isAlive == 1 && neighbors < 2) {
-								field2[i][j] = 0;
-								counterDead++;
-								countDead.innerHTML = counterDead  + ' | ';
-							} else { 
-								field2[i][j] = 0; counterDead++;
-									countDead.innerHTML = counterDead + ' | ';
-							}
-						}
-					}
-				}
+				checkNeighbors();
+
 
 				// Проверка на наличие точек на поле
 				if (statusField < 1 && randomStatus == 0) {
@@ -368,82 +344,106 @@ function startLife() {
 							location.reload(); // перезагрузки странички
 							break;
 					}
-
 					return;
 				}
+
+				function checkNeighbors() {
+					if (isAlive == 0 && neighbors === 3) {
+						fieldTemp[i][j] = 1;
+						counterLife++;
+						countLife.innerHTML = counterLife  + ' | ';
+					} else {
+						if (isAlive == 1 && (neighbors === 3 || neighbors === 2)) {
+							fieldTemp[i][j] = 1; 
+							counterLife++;
+							countLife.innerHTML = counterLife  + ' | ';
+						} else {
+							if (isAlive == 1 && neighbors > 3) {
+								fieldTemp[i][j] = 0;
+								counterDead++;
+								countDead.innerHTML = counterDead  + ' | ';
+							} else {
+								if (isAlive == 1 && neighbors < 2) {
+									fieldTemp[i][j] = 0;
+									counterDead++;
+									countDead.innerHTML = counterDead  + ' | ';
+								} else { 
+									fieldTemp[i][j] = 0; counterDead++;
+										countDead.innerHTML = counterDead + ' | ';
+								}
+							}
+						}
+					}
+				}
+
+
 			}
 		}
-
-		// присваиваем новое состояние
-		field = field2;
-
-		// Запускаем ф-цию отрисовки
-		drawField();
-
-		// увеличиваем счетчик
-		count++;
-
-		// Записываем в span (html) наш счетчик
-		countCycle.innerHTML = count + ' | ';
-
-		statusField = 0;
-		checkFieldEmpty();
-
-		countPoint.innerHTML = statusField;
-		randomStatus = 0; // отбой нашего рандома
 		
-		// таймер для отрисовки
-		let timer = setTimeout(startLife, speedGame.value); //Где 300 это период отрисовки
+		field = fieldTemp;
+		drawField();		
+		count++;		
+		countCycle.innerHTML = count + ' | ';
+		statusField = 0;
+		checkEmptyField();
+		countPoint.innerHTML = statusField;
+		randomStatus = 0;
+		
+		// NOTE: timer for drawing
+		setTimeout(startLife, speedGame.value);
 	}
+	
+	
+
+
+	// NOTE: take into account the output of the field from the top
+	function topFieldOut(i) {
+		if (i == 0) {
+			return fieldSquare;
+		}
+		return i;
+	}
+
+	// NOTE: take into account the output of the field from the right
+	function rightFieldOut(i) {
+		if (i == fieldSquare * 1 - 1) {
+			return -1; 
+		}
+		return i;
+	}
+
 	return;	
 }
 
 // ---
 
-// учитываем выход за предел поля с верху
-function topField(i) {
-	if (i == 0) {
-		return fieldSquare;
-	}
-	return i;
-}
-
-// учитываем выход за предел поля с права
-function fpp(i) {
-	if (i == fieldSquare * 1 - 1) {
-		return -1; 
-	}
-	return i;
-}
-
-// ---
-
-// Вешаем на canvas событие click, где event указывает, что мы будем работать с событием
-// canvas.onclick = function(event) {
-	canvas.onclick = function clickMouseButton(event) {
-	// Определим координату мыши относительно canvas
+/**
+ * NOTE:
+ * we hang the click event on canvas, where the event indicates that 
+ * we will work with the event
+ */
+canvas.onclick = function clickMouseButton(event) {	
 	let x = event.offsetX;
 	let y = event.offsetY;
-	
-	console.log('offsetX: ' + x);
-	console.log('offsetY: ' + y);
+	console.log('offsetX: ' + x + ' | ' + 'offsetY: ' + y);	
 
-	// Поля от 0 до 10 будут принадлежать первому кубику, от 10 до 20 - 2му, и.т.д.
-	x = Math.floor(x / pointSize); //300 / 10 = 30 кубиков, затем округляем в нижнюю сторону
+	/**
+	 * NOTE:
+	 * fields from 0 to 10 will belong to the first cube, 
+	 * from 10 to 20 - second, etc.
+	 * 300 / 10 = 30 cubes, then round to the bottom
+	 */
+	x = Math.floor(x / pointSize);
 	y = Math.floor(y / pointSize);
-
-	console.log('X: ' + x);
-	console.log('Y: ' + y);
+	console.log('X: ' + x + ' | ' + 'Y: ' + y);	
 	
+	// NOTE: Filling the playing field, where we click, there will be ONE
 	if (field[y][x] == 0) {
-		field[y][x] = 1; // Заполнение игрового поля, т.е. куда кликнем, там будет ЕДИНИЦА
+		field[y][x] = 1;
 	} else {
 		field[y][x] = 0;
 	}
 
-	// Проверяем
-	console.log(field); //В начале и в конце будет 1, если тыкнуть на начало и конце поля
-	// masTemp = mas;	// подумать надо ли это или нет
-
-	drawField(); // Ф-ция которая будет отрисовывать точку при клике		
+	drawField();
+	console.log(field);
 };

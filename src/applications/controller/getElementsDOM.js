@@ -53,9 +53,4 @@ export class getElementsDOM {
   get getFieldHeightDOM() {
     return this.fieldHeight;
   }
-
-  // function
-  // complete() {
-  //   console.log(this.canvas + ' func');
-  // }
 }
