@@ -4,14 +4,14 @@ import {
 	startGame, 
 	randomFill, 
 	pauseGame, 
-	fieldSize
+	getFieldSize
 } from '../model/model.js';		
 
 // ---
 
 export class getEventsElementsDOM {
 	constructor() {
-		// events for the buttons
+		// events for the buttons & fields
 		this.buttonStart = 
 			document.getElementsByClassName('start')[0].onclick = startGame;
 
@@ -22,10 +22,10 @@ export class getEventsElementsDOM {
 			document.getElementsByClassName('pause')[0].onclick = pauseGame;
 
 		this.inputFieldWidth = 
-			document.getElementsByClassName('width')[0].onclick = fieldSize;
+			document.getElementsByClassName('width')[0].onclick = getFieldSize;
 
 		this.inputFieldHeight = 
-			document.getElementsByClassName('height')[0].onclick = fieldSize;
+			document.getElementsByClassName('height')[0].onclick = getFieldSize;
 	}		
 
 	// disable input for edits
