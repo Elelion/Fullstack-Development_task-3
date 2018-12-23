@@ -277,131 +277,129 @@ export function resetGame() {
 // ---
 
 function startLife() {
+	let i;
+	let j;
+	let neighbors;
 	let fieldTemp = [];
-	let isAlive = [];		
+	let isAlive = [];
 
-	if (pausePlayStatus == 0  && statusFieldReset == 0) {		
-		for (let i = 0; i < fieldSquare; i++) {			
-			fieldTemp[i] = [];			
-			for (let j = 0; j < fieldSquare; j++) {				
-				// мы должны посчитать кол-во соседей, нужно учесть что тут у нас встречаются
-				// краевые условия
-				let neighbors = 0;
-				setCountNeighbors();
-				isAlive = field[i][j]; // т.е. это текущее состояние с точками
-				getCheckNeighbors();
-				getCheckPointsField();		
+	gameLoop();
 
-				function setCountNeighbors() {
-					// NOTE: ↑
-					if (field[topFieldOut(i) - 1][j] == 1) {
-						neighbors++;
-					} 
+	function gameLoop() {
+		if (pausePlayStatus == 0  && statusFieldReset == 0) {		
+			for (i = 0; i < fieldSquare; i++) {			
+				fieldTemp[i] = [];			
+				for (j = 0; j < fieldSquare; j++) {				
+					neighbors = 0;
+					setCountNeighbors();
 
-					// NOTE: →
-					if (field[i][rightFieldOut(j) + 1] == 1) { 
-						neighbors++;
-					}
-					
-					// NOTE: ↓
-					if (field[rightFieldOut(i) + 1][j] == 1) {
-						neighbors++;
-					}
-					
-					// NOTE: ←
-					if (field[i][topFieldOut(j) - 1] == 1) {
-						neighbors++;
-					}
-					
-					// NOTE: ↗
-					if (field[topFieldOut(i) - 1][rightFieldOut(j) + 1] == 1) {
-						neighbors++;
-					}
-					
-					// NOTE: ↘
-					if (field[rightFieldOut(i) + 1][rightFieldOut(j) + 1] == 1) {
-						neighbors++;
-					}
-					
-					// NOTE: ↙
-					if (field[rightFieldOut(i) + 1][topFieldOut(j) - 1] == 1) {
-						neighbors++;
-					}
-					
-					// NOTE: ↖
-					if (field[topFieldOut(i) - 1][topFieldOut(j) - 1] == 1) {
-						neighbors++;
-					}
+					// NOTE: this is the current state with points
+					isAlive = field[i][j];
+
+					getCheckNeighbors();
+					getCheckPointsField();
 				}
+			}
+			
+			setData();
+		}
+	}
 
-				function getCheckNeighbors() {
-					if (isAlive == 0 && neighbors === 3) {
-						fieldTemp[i][j] = 1;
-						counterLife++;
-						countLife.innerHTML = counterLife  + ' | ';
-					} else {
-						if (isAlive == 1 && (neighbors === 3 || neighbors === 2)) {
-							fieldTemp[i][j] = 1; 
-							counterLife++;
-							countLife.innerHTML = counterLife  + ' | ';
-						} else {
-							if (isAlive == 1 && neighbors > 3) {
-								fieldTemp[i][j] = 0;
-								counterDead++;
-								countDead.innerHTML = counterDead  + ' | ';
-							} else {
-								if (isAlive == 1 && neighbors < 2) {
-									fieldTemp[i][j] = 0;
-									counterDead++;
-									countDead.innerHTML = counterDead  + ' | ';
-								} else { 
-									fieldTemp[i][j] = 0; counterDead++;
-										countDead.innerHTML = counterDead + ' | ';
-								}
-							}
-						}
-					}
-				}
+	function setCountNeighbors() {
+		// NOTE: ↑
+		if (field[topFieldOut(i) - 1][j] == 1) {
+			neighbors++;
+		} 
 
-				function getCheckPointsField() {
-					if (statusField < 1 && randomStatus == 0) {
-						alert('GameOver man!. Все точки сдохли, плодиться не кому.');					
-						let request = prompt('Введите: НЕТ - что бы остаться на страничке', '');
+		// NOTE: →
+		if (field[i][rightFieldOut(j) + 1] == 1) { 
+			neighbors++;
+		}
+		
+		// NOTE: ↓
+		if (field[rightFieldOut(i) + 1][j] == 1) {
+			neighbors++;
+		}
+		
+		// NOTE: ←
+		if (field[i][topFieldOut(j) - 1] == 1) {
+			neighbors++;
+		}
+		
+		// NOTE: ↗
+		if (field[topFieldOut(i) - 1][rightFieldOut(j) + 1] == 1) {
+			neighbors++;
+		}
+		
+		// NOTE: ↘
+		if (field[rightFieldOut(i) + 1][rightFieldOut(j) + 1] == 1) {
+			neighbors++;
+		}
+		
+		// NOTE: ↙
+		if (field[rightFieldOut(i) + 1][topFieldOut(j) - 1] == 1) {
+			neighbors++;
+		}
+		
+		// NOTE: ↖
+		if (field[topFieldOut(i) - 1][topFieldOut(j) - 1] == 1) {
+			neighbors++;
+		}
+	}
 
-						switch (request) {
-							case 'ДА': 
-								location.reload(); 
-								break;
-
-							case 'НЕТ': case 'Нет': case 'нет': case 'НеТ': 
-							case 'НЕт': case 'неТ': case 'нЕт':
-								pausePlay.disabled = true;
-								startStop.disabled = true;
-								break;
-
-							default: 
-								alert('Некорректное действие, страница будет перезагружена');
-								location.reload();
-								break;
-						}
-
-						return;
+	function getCheckNeighbors() {
+		if (isAlive == 0 && neighbors === 3) {
+			fieldTemp[i][j] = 1;
+			counterLife++;
+			countLife.innerHTML = counterLife  + ' | ';
+		} else {
+			if (isAlive == 1 && (neighbors === 3 || neighbors === 2)) {
+				fieldTemp[i][j] = 1; 
+				counterLife++;
+				countLife.innerHTML = counterLife  + ' | ';
+			} else {
+				if (isAlive == 1 && neighbors > 3) {
+					fieldTemp[i][j] = 0;
+					counterDead++;
+					countDead.innerHTML = counterDead  + ' | ';
+				} else {
+					if (isAlive == 1 && neighbors < 2) {
+						fieldTemp[i][j] = 0;
+						counterDead++;
+						countDead.innerHTML = counterDead  + ' | ';
+					} else { 
+						fieldTemp[i][j] = 0; counterDead++;
+							countDead.innerHTML = counterDead + ' | ';
 					}
 				}
 			}
 		}
-		
-		field = fieldTemp;
-		drawField();		
-		count++;		
-		statusField = 0;
-		randomStatus = 0;
-		countCycle.innerHTML = count + ' | ';
-		countPoint.innerHTML = statusField;
-		checkEmptyField();
-		
-		// NOTE: timer for drawing
-		setTimeout(startLife, speedGame.value);
+	}
+
+	function getCheckPointsField() {
+		if (statusField < 1 && randomStatus == 0) {
+			alert('GameOver man!. Все точки сдохли, плодиться не кому.');					
+			let request = prompt('Введите: НЕТ - что бы остаться на страничке', '');
+
+			switch (request) {
+				case 'ДА': 
+					location.reload(); 
+					break;
+
+				case 'НЕТ': case 'Нет': case 'нет': case 'НеТ': 
+				case 'НЕт': case 'неТ': case 'нЕт':
+					pausePlay.disabled = true;
+					startStop.disabled = true;
+					break;
+
+				default: 
+					alert('Некорректное действие, страница будет перезагружена');
+					location.reload();
+					break;
+			}
+
+			return;
+		}
 	}
 
 	// NOTE: take into account the output of the field from the top
@@ -420,6 +418,20 @@ function startLife() {
 		}
 
 		return i;
+	}
+
+	function setData() {
+		field = fieldTemp;
+		drawField();				
+		statusField = 0;
+		randomStatus = 0;
+		count++;
+		countCycle.innerHTML = count + ' | ';
+		countPoint.innerHTML = statusField;
+		checkEmptyField();
+		
+		// NOTE: timer for drawing
+		setTimeout(startLife, speedGame.value);
 	}
 
 	return;	
