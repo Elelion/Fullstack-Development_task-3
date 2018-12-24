@@ -41,6 +41,7 @@ let startStatus = 0;
 
 // FIXME: think... is there a need?
 // var startSpeed = 0;
+
 setWidthHeightCanvas();
 setCtx();
 setFieldSquare();
@@ -96,6 +97,42 @@ export let field = function field() {
 
 // ---
 
+// NOTE: general function
+function getReloadSheet() {
+	location.reload();
+}	
+
+// ---
+
+// NOTE: general function
+function clearField() {	
+	for (let i = 0; i < fieldSquare; i++) {
+		field[i] = [];
+
+		for (let j = 0; j < fieldSquare; j++) {
+			field[i][j] = 0;
+		}
+	}
+}
+clearField();
+
+// ---
+
+// NOTE: general function
+function checkEmptyField() {	
+	for (let i = 0; i < fieldSquare; i++) {
+		for (let j = 0; j < fieldSquare; j++) {
+			if (field[i][j] != 0) {
+				statusField++;
+			}
+		}
+	}
+
+	countPoint.innerHTML = statusField;
+}
+
+// ---
+
 export function getFieldSize() {
 	proportionHeightWidth();
 	randomFillNewSize();
@@ -121,35 +158,8 @@ export function getFieldSize() {
 
 	function setNewField() {
 		fieldSquare = canvas.width * 1 / POINT_SIZE * 1;	
-		location.reload();	
+		getReloadSheet();
 	}
-}
-
-// ---
-
-function clearField() {	
-	for (let i = 0; i < fieldSquare; i++) {
-		field[i] = [];
-
-		for (let j = 0; j < fieldSquare; j++) {
-			field[i][j] = 0;
-		}
-	}
-}
-clearField();
-
-// ---
-
-function checkEmptyField() {	
-	for (let i = 0; i < fieldSquare; i++) {
-		for (let j = 0; j < fieldSquare; j++) {
-			if (field[i][j] != 0) {
-				statusField++;
-			}
-		}
-	}
-
-	countPoint.innerHTML = statusField;
 }
 
 // ---
@@ -236,28 +246,35 @@ export function randomFill() {
 // ---
 
 export function startGame() {
-	if (startStatus == 0) {
+	if (startStatus == 0) {		
 		checkEmptyField();
+		preparingPlay();
 
+		startStatus = 1;
+		startStop.innerHTML = 'Stop';
+
+		console.log('startStatus: ' + startStatus);
+	} else {		
+		resetGame();
+		getReloadSheet();
+
+		// TODO: thinking about implement without reloading the page
+		// startStatus = 0;
+		// startStop.innerHTML = 'Start';
+		// console.log('startStatus: ' + startStatus);		
+	}
+
+	function preparingPlay() {
 		if (statusField > 1) {
-			statusFieldReset = 0;			
+			statusFieldReset = 0;
 			pausePlay.disabled = false;
 
-			startLife();
+			startLife();			
 		} else {
 			alert('Нужно больше точек...');
 			return;
 		}
-
-		startStatus = 1;
-		startStop.innerHTML = 'Stop';
-		console.log('startStatus: ' + startStatus);
-	} else {
-		resetGame();
-
-		startStatus = 0;
-		startStop.innerHTML = 'Start';
-	}
+	}	
 }
 
 // ---
@@ -293,9 +310,9 @@ export function resetGame() {
 // ---
 
 function startLife() {
-	let i;
-	let j;
-	let neighbors;
+	let i = 0;
+	let j = 0;
+	let neighbors = 0;
 	let fieldTemp = [];
 	let isAlive = [];
 
@@ -322,45 +339,109 @@ function startLife() {
 	}
 
 	function setCountNeighbors() {
-		// NOTE: ↑
-		if (field[topFieldOut(i) - 1][j] == 1) {
-			neighbors++;
-		} 
+		let top = field[topFieldOut(i) - 1][j];
+		let right = field[i][rightFieldOut(j) + 1];
+		let bottom = field[rightFieldOut(i) + 1][j];
+		let left = field[i][topFieldOut(j) - 1];
+		let topRight = field[topFieldOut(i) - 1][rightFieldOut(j) + 1];
+		let bottomRight = field[rightFieldOut(i) + 1][rightFieldOut(j) + 1];
+		let bottomLeft = field[rightFieldOut(i) + 1][topFieldOut(j) - 1];
+		let topLeft = field[topFieldOut(i) - 1][topFieldOut(j) - 1];		
 
-		// NOTE: →
-		if (field[i][rightFieldOut(j) + 1] == 1) { 
-			neighbors++;
+		// if ((top == 1) || (right == 1) || (bottom == 1) || (left == 1) || 
+		// 		(topRight == 1) || (bottomRight == 1) || (bottomLeft == 1) || (topLeft == 1)) {
+		// 	neighbors++;
+		// } 
+		
+		
+		if (top == 1) { 
+			neighbors++;			
+		}
+
+		if (right == 1) { 
+			neighbors++;			
+		}
+
+		if (bottom == 1) { 
+			neighbors++;			
+		}
+
+		if (left == 1) { 
+			neighbors++;			
+		}
+
+		if (topRight == 1) { 
+			neighbors++;			
+		}
+
+		if (bottomRight == 1) { 
+			neighbors++;			
+		}
+
+		if (bottomLeft == 1) { 
+			neighbors++;			
+		}
+
+		if (topLeft == 1) { 
+			neighbors++;			
 		}
 		
-		// NOTE: ↓
-		if (field[rightFieldOut(i) + 1][j] == 1) {
-			neighbors++;
-		}
+		// NOTE: ↑ || → || ↓ || ← || ↗ || ↘ || ↙ || ↖
+		// if ((field[topFieldOut(i) - 1][j] == 1) || (field[i][rightFieldOut(j) + 1] == 1)) { 
+		// 	neighbors++;
+		// }
 		
-		// NOTE: ←
-		if (field[i][topFieldOut(j) - 1] == 1) {
-			neighbors++;
-		}
+		// if ((field[rightFieldOut(i) + 1][j] == 1) || (field[i][topFieldOut(j) - 1] == 1)) { 
+		// 	neighbors++;
+		// }
+				
+		// if ((field[topFieldOut(i) - 1][rightFieldOut(j) + 1] == 1) || (field[rightFieldOut(i) + 1][rightFieldOut(j) + 1] == 1)) {
+		// 	neighbors++;
+		// }
+
+		// if ((field[rightFieldOut(i) + 1][topFieldOut(j) - 1] == 1) || (field[topFieldOut(i) - 1][topFieldOut(j) - 1] == 1)) {
+		// 	neighbors++;
+		// }
+
+		// // NOTE: ↑
+		// if (field[topFieldOut(i) - 1][j] == 1) {
+		// 	neighbors++;
+		// } 
+
+		// // NOTE: →
+		// if (field[i][rightFieldOut(j) + 1] == 1) { 
+		// 	neighbors++;
+		// }
 		
-		// NOTE: ↗
-		if (field[topFieldOut(i) - 1][rightFieldOut(j) + 1] == 1) {
-			neighbors++;
-		}
+		// // NOTE: ↓
+		// if (field[rightFieldOut(i) + 1][j] == 1) {
+		// 	neighbors++;
+		// }
 		
-		// NOTE: ↘
-		if (field[rightFieldOut(i) + 1][rightFieldOut(j) + 1] == 1) {
-			neighbors++;
-		}
+		// // NOTE: ←
+		// if (field[i][topFieldOut(j) - 1] == 1) {
+		// 	neighbors++;
+		// }
 		
-		// NOTE: ↙
-		if (field[rightFieldOut(i) + 1][topFieldOut(j) - 1] == 1) {
-			neighbors++;
-		}
+		// // NOTE: ↗
+		// if (field[topFieldOut(i) - 1][rightFieldOut(j) + 1] == 1) {
+		// 	neighbors++;
+		// }
 		
-		// NOTE: ↖
-		if (field[topFieldOut(i) - 1][topFieldOut(j) - 1] == 1) {
-			neighbors++;
-		}
+		// // NOTE: ↘
+		// if (field[rightFieldOut(i) + 1][rightFieldOut(j) + 1] == 1) {
+		// 	neighbors++;
+		// }
+		
+		// // NOTE: ↙
+		// if (field[rightFieldOut(i) + 1][topFieldOut(j) - 1] == 1) {
+		// 	neighbors++;
+		// }
+		
+		// // NOTE: ↖
+		// if (field[topFieldOut(i) - 1][topFieldOut(j) - 1] == 1) {
+		// 	neighbors++;
+		// }
 	}
 
 	function getCheckNeighbors() {
@@ -399,18 +480,19 @@ function startLife() {
 
 			switch (request) {
 				case 'ДА': 
-					location.reload(); 
+					getReloadSheet();
 					break;
 
 				case 'НЕТ': case 'Нет': case 'нет': case 'НеТ': 
 				case 'НЕт': case 'неТ': case 'нЕт':
 					pausePlay.disabled = true;
-					startStop.disabled = true;
+					startStop.disabled = false;
+					clearTimeout(handle);
 					break;
 
 				default: 
 					alert('Некорректное действие, страница будет перезагружена');
-					location.reload();
+					getReloadSheet();
 					break;
 			}
 
