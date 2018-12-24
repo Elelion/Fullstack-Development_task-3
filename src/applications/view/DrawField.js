@@ -5,7 +5,7 @@ import {
 	ctx,
 	field,
 	fieldSquare,
-	pointSize
+	POINT_SIZE
 } from '../model/model.js';
 
 // ---
@@ -26,7 +26,7 @@ export function drawField() {
 		for (let i = 0; i < fieldSquare; i++) {
 			for (let j = 0; j < fieldSquare; j++) {
 				if (field[i][j] == 1) {
-					ctx.fillRect(j * pointSize, i * pointSize, pointSize, pointSize);
+					ctx.fillRect(j * POINT_SIZE, i * POINT_SIZE, POINT_SIZE, POINT_SIZE);
 				}
 			}
 		}	

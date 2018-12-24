@@ -1,41 +1,31 @@
 /* jshint esversion: 6 */
 
-// Модель - это данные и правила, которые используются для работы с данными, 
-// которые представляют концепцию управления приложением. В любом приложении 
-// вся структура моделируется как данные, которые обрабатываются определённым 
-// образом. Что такое пользователь для приложения — сообщение или книга? Только
-// данные, которые должны быть обработаны в соответствии с правилами (дата не 
-// может указывать в будущее, e-mail должен быть в определённом формате, имя 
-// не может быть длиннее Х символов, и так далее).
-
-// ---
-
 import {drawField} from '../view/DrawField.js';
 import {getElementsDOM} from '../controller/getElementsDOM.js';
 
-const GREEN = '#00FF00';
+const COLOR_GREEN = '#00FF00';
+const GET_DOM = new getElementsDOM();
+export const POINT_SIZE = 10; 
 
-let getDOM = new getElementsDOM();
-let countCycle = getDOM.getCountCycleDOM;
-let countLife = getDOM.getCountLifeDOM;
-let countDead = getDOM.getCountDeadDOM;
-let pausePlay = getDOM.getPausePlayDOM;
-let startStop = getDOM.getStartStopDOM;
-let countPoint = getDOM.getCountPointDOM;
-let speedGame = getDOM.getSpeedGameDOM;
-let fieldWidth = getDOM.getFieldWidthDOM;
-let fieldHeight = getDOM.getFieldHeightDOM;
-export let canvas = getDOM.getCanvasFieldDOM;
+let countCycle = GET_DOM.getCountCycleDOM;
+let countLife = GET_DOM.getCountLifeDOM;
+let countDead = GET_DOM.getCountDeadDOM;
+let pausePlay = GET_DOM.getPausePlayDOM;
+let startStop = GET_DOM.getStartStopDOM;
+let countPoint = GET_DOM.getCountPointDOM;
+let speedGame = GET_DOM.getSpeedGameDOM;
+let fieldWidth = GET_DOM.getFieldWidthDOM;
+let fieldHeight = GET_DOM.getFieldHeightDOM;
+export let canvas = GET_DOM.getCanvasFieldDOM;
 
-canvas.width = fieldWidth.value;
-canvas.height = fieldHeight.value;
-
-// NOTE: ctx = ConTeXt
-export let ctx = canvas.getContext('2d');
+export let ctx;
+export let fieldSquare;
+let randomStep;
 
 let count = 0;
 let counterLife = 0;
 let counterDead = 0;
+let pausePlayStatus = 0;
 
 /**
  * NOTE:
@@ -44,7 +34,6 @@ let counterDead = 0;
  * randomStatus: for random points, 0 - not be randoming, 1 - randoming
  * startStatus: 0 - start, 1 - stop
  */
-let pausePlayStatus = 0;
 let statusField = 0;
 let statusFieldReset = 0;
 let randomStatus = 0;
@@ -52,14 +41,33 @@ let startStatus = 0;
 
 // FIXME: think... is there a need?
 // var startSpeed = 0;
+setWidthHeightCanvas();
+setCtx();
+setFieldSquare();
+setRandomStep();
+setCellFieldSize();
+setPointColor();
+DisabledButtons();
 
-export let pointSize = 10; 
+function setWidthHeightCanvas() {
+	canvas.width = fieldWidth.value;
+	canvas.height = fieldHeight.value;
+}
+
+// NOTE: ctx = ConTeXt
+function setCtx() {
+	ctx = canvas.getContext('2d');
+}
 
 // NOTE: 300 / 10 = 30, it is array will have 30х30
-export let fieldSquare = canvas.width * 1 / pointSize * 1;
+function setFieldSquare() {
+	fieldSquare = canvas.width * 1 / POINT_SIZE * 1;
+}
 
 // NOTE: for randoming field filling, lookup: fieldSize()
-let randomStep = canvas.width * 70 / 100;
+function setRandomStep() {	
+	randomStep = canvas.width * 70 / 100;
+}
 
 /**
  * NOTE:
@@ -67,10 +75,18 @@ let randomStep = canvas.width * 70 / 100;
  * which is put when you click
  * ctx.fillStyle - color for square
  */
-canvas.style.backgroundSize = pointSize + 'px ' + pointSize + 'px';
-ctx.fillStyle = GREEN;
-pausePlay.disabled = true;
-// TODO: think of random colors...
+function setCellFieldSize() {
+	canvas.style.backgroundSize = POINT_SIZE + 'px ' + POINT_SIZE + 'px';
+}
+
+function setPointColor() {
+	ctx.fillStyle = COLOR_GREEN;
+	// TODO: think of random colors...
+}
+
+function DisabledButtons() {
+	pausePlay.disabled = true;
+}
 
 // NOTE: creating global empty array, our field for points
 export let field = function field() {
@@ -104,7 +120,7 @@ export function getFieldSize() {
 	}
 
 	function setNewField() {
-		fieldSquare = canvas.width * 1 / pointSize * 1;	
+		fieldSquare = canvas.width * 1 / POINT_SIZE * 1;	
 		location.reload();	
 	}
 }
@@ -189,8 +205,8 @@ export function randomFill() {
 		for (let i = 0; i < randomStep; i++) {
 			let randX = Math.round(Math.random() * (max - min) + min);
 			let randY = Math.round(Math.random() * (max - min) + min);
-			randX = Math.floor(randX / pointSize);
-			randY = Math.floor(randY / pointSize);
+			randX = Math.floor(randX / POINT_SIZE);
+			randY = Math.floor(randY / POINT_SIZE);
 
 			field[randY][randX] = 1;
 			drawField();
@@ -464,8 +480,8 @@ canvas.onclick = function clickMouseButton(event) {
 		y = event.offsetY;
 		console.log('offsetX: ' + x + ' | ' + 'offsetY: ' + y);	
 		
-		x = Math.floor(x / pointSize);
-		y = Math.floor(y / pointSize);
+		x = Math.floor(x / POINT_SIZE);
+		y = Math.floor(y / POINT_SIZE);
 		console.log('X: ' + x + ' | ' + 'Y: ' + y);	
 	}
 
