@@ -1,56 +1,65 @@
 /* jshint esversion: 6 */
 
+import {Model} from '../model/model.js';
+
+// const GET_DOM = new getElementsDOM();
+
+// ---
+
 export class getElementsDOM {
   constructor() {
-    this.canvasField = document.getElementsByClassName('grid__gradient')[0];
+    this.model = new Model;
+
     this.countCycle = document.getElementsByClassName('count__cycle')[0];
     this.countLife = document.getElementsByClassName('count__life')[0];
     this.countDead = document.getElementsByClassName('count__dead')[0];
     this.countPoint = document.getElementsByClassName('count__point')[0];
     this.pausePlay = document.getElementsByClassName('pause')[0];
-    this.startStop = document.getElementsByClassName('start')[0];    
-    this.speedGame = document.getElementsByClassName('speed')[0];
-    this.fieldWidth = document.getElementsByClassName('width')[0];
-    this.fieldHeight = document.getElementsByClassName('height')[0];
-  }
- 
-  get getCanvasFieldDOM() {
-    return this.canvasField;
-  }
+    this.startStop = document.getElementsByClassName('start')[0];
 
-  get getCountCycleDOM() {
+    // this.speedGame = document.getElementsByClassName('speed')[0];
+    // this.fieldWidth = document.getElementsByClassName('width')[0];
+    // this.fieldHeight = document.getElementsByClassName('height')[0];
+    // this.canvasField = document.getElementsByClassName('grid__gradient')[0];
+  }  
+
+  getCountCycleDOM() {
     return this.countCycle;
   }
 
-  get getCountLifeDOM() {
+  getCountLifeDOM() {
     return this.countLife;
   }
 
-  get getCountDeadDOM() {
+  getCountDeadDOM() {
     return this.countDead;
   }
 
-  get getCountPointDOM() {
+  getCountPointDOM() {
     return this.countPoint;
   }
 
-  get getPausePlayDOM() {
+  getPausePlayDOM() {
     return this.pausePlay;
   }
 
-  get getStartStopDOM() {
+  getStartStopDOM() {
     return this.startStop;
   }
 
-  get getSpeedGameDOM() {
-    return this.speedGame;
-  }
+  // getSpeedGameDOM() {
+  //   return this.speedGame;
+  // }
 
-  get getFieldWidthDOM() {
-    return this.fieldWidth;
-  }
+  // getFieldWidthDOM() {
+  //   return this.fieldWidth;
+  // }
 
-  get getFieldHeightDOM() {
-    return this.fieldHeight;
-  }
+  // getFieldHeightDOM() {
+  //   return this.fieldHeight;
+  // }
+
+  // getCanvasFieldDOM() {
+  //   return this.canvasField;
+  // }
 }

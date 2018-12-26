@@ -5,7 +5,7 @@ import {
 	randomFill, 
 	pauseGame, 
 	getFieldSize
-} from '../model/model.js';		
+} from '../model/model-bak.js';		
 
 // ---
 

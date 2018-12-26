@@ -1,43 +1,38 @@
 # ___general___
-
 .vscode/
 index-bak.html
 refactoring-events/
-
-# ___src___
-
 src/node_modules/
-src/images/templates/
-src/.sass-cache/
-src/styles.css.map
+
+
+#___applications___
 src/applications/scripts.js
 
+# ___model___
+src/applications/model/model-bak.js
+
+# ___view___
+src/applications/view/drawField.js
+
+
+#___blocks___
 
 # ___content___
-
-src/blocks/content/.sass-cache/
+src/blocks/content/.sass-cache
 src/blocks/content/content.css.map
 
-
 # ___control-panel___
-
-src/blocks/control-panel/.sass-cache/
+src/blocks/control-panel/.sass-cache
 src/blocks/control-panel/control-panel.css.map
 
-
 # ___field___
-
-src/blocks/field/.sass-cache/
+src/blocks/field/.sass-cache
 src/blocks/field/field.css.map
 
-
 # ___log___
-
-src/blocks/log/.sass-cache/
+src/blocks/log/.sass-cache
 src/blocks/log/log.css.map
 
-
 # ___settings___
-
-src/blocks/settings/.sass-cache/
+src/blocks/settings/.sass-cache
 src/blocks/settings/settings.css.map

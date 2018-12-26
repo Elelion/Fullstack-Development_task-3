@@ -1,26 +1,117 @@
 /* jshint esversion: 6 */
 
-import {drawField} from '../view/DrawField.js';
-import {getElementsDOM} from '../controller/getElementsDOM.js';
+export class Model {
+	constructor() {
+		this.ctx;
+		this.fieldSquare;
+		this.pointSize;
+		this.randomStep;
 
-const COLOR_GREEN = '#00FF00';
-const GET_DOM = new getElementsDOM();
-export const POINT_SIZE = 10; 
+		// NOTE: creating global empty array, our field for points
+		this.field = [];
 
-let countCycle = GET_DOM.getCountCycleDOM;
-let countLife = GET_DOM.getCountLifeDOM;
-let countDead = GET_DOM.getCountDeadDOM;
-let pausePlay = GET_DOM.getPausePlayDOM;
-let startStop = GET_DOM.getStartStopDOM;
-let countPoint = GET_DOM.getCountPointDOM;
-let speedGame = GET_DOM.getSpeedGameDOM;
-let fieldWidth = GET_DOM.getFieldWidthDOM;
-let fieldHeight = GET_DOM.getFieldHeightDOM;
-export let canvas = GET_DOM.getCanvasFieldDOM;
+		this.speedGame = document.getElementsByClassName('speed')[0];
+		this.fieldWidth = document.getElementsByClassName('width')[0];
+		this.fieldHeight = document.getElementsByClassName('height')[0];
+		this.canvas = document.getElementsByClassName('grid__gradient')[0];		
 
-export let ctx;
-export let fieldSquare;
-let randomStep;
+		this.setCtx();
+		this.setFieldSquare();
+		this.setWidthHeightCanvas();
+		this.setCellFieldSize();
+	}	
+
+	// DEBIGGING: get for view
+	setColorPoint(color) {
+		this.ctx.fillStyle = color;
+	}	
+	
+	// NOTE: ctx = ConTeXt
+	setCtx() {
+		this.ctx = this.canvas.getContext('2d');
+	}
+
+	setCtxClear() {
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	}
+
+	// DEBIGGING: get for view
+	setSizePoint(size) {
+		this.pointSize = size;
+	}
+
+	getSizePoint() {
+		return this.pointSize;
+	}
+
+	// NOTE: 300 / 10 = 30, it is array will have 30х30
+	setFieldSquare() {
+		let pointSize = model.getSizePoint();
+		this.fieldSquare = this.canvas.width * 1 / pointSize * 1;
+	}
+
+	// DEBIGGING: get for view
+	// NOTE: for randoming field filling, lookup: fieldSize()		
+	setRandomStep(randomMax) {		
+		if (randomMax > 80) {			
+			this.randomStep = this.canvas.width * 80 / 100;
+		}	else {
+			this.randomStep = this.canvas.width * randomMax / 100;
+		}
+	}
+
+	getRandomStep() {
+		return this.randomStep;
+	}
+
+	setWidthHeightCanvas() {
+		this.canvas.width = this.fieldWidth.value;
+		this.canvas.height = this.fieldHeight.value;
+	}
+
+	/**
+	 * NOTE:
+	 * the size for the cell field, comes from the size of the square, 
+	 * which is put when you click
+	 * ctx.fillStyle - color for square
+	 */
+	setCellFieldSize() {
+		let pointSize = model.getSizePoint();
+		this.canvas.style.backgroundSize = pointSize + 'px ' + pointSize + 'px';
+	}
+	
+	getField() {
+		return this.field;
+
+		// export let field = function field() {
+		// 	let field = [];
+		// 	return field;
+		// }
+	}
+
+}
+// ----------------------------------------------------------------------------
+
+// const COLOR_GREEN = '#00FF00';
+// export const POINT_SIZE = 10; 
+
+// const GET_DOM = new getElementsDOM();
+
+// let countCycle = GET_DOM.getCountCycleDOM;
+// let countLife = GET_DOM.getCountLifeDOM;
+// let countDead = GET_DOM.getCountDeadDOM;
+// let pausePlay = GET_DOM.getPausePlayDOM;
+// let startStop = GET_DOM.getStartStopDOM;
+// let countPoint = GET_DOM.getCountPointDOM;
+
+// let speedGame = GET_DOM.getSpeedGameDOM;
+// let fieldWidth = GET_DOM.getFieldWidthDOM;
+// let fieldHeight = GET_DOM.getFieldHeightDOM;
+// export let canvas = GET_DOM.getCanvasFieldDOM;
+
+// export let ctx;
+// export let fieldSquare;
+// let randomStep;
 
 let count = 0;
 let counterLife = 0;
@@ -42,58 +133,14 @@ let startStatus = 0;
 // FIXME: think... is there a need?
 // var startSpeed = 0;
 
-setWidthHeightCanvas();
-setCtx();
-setFieldSquare();
-setRandomStep();
-setCellFieldSize();
-setPointColor();
-DisabledButtons();
 
-function setWidthHeightCanvas() {
-	canvas.width = fieldWidth.value;
-	canvas.height = fieldHeight.value;
-}
 
-// NOTE: ctx = ConTeXt
-function setCtx() {
-	ctx = canvas.getContext('2d');
-}
 
-// NOTE: 300 / 10 = 30, it is array will have 30х30
-function setFieldSquare() {
-	fieldSquare = canvas.width * 1 / POINT_SIZE * 1;
-}
 
-// NOTE: for randoming field filling, lookup: fieldSize()
-function setRandomStep() {	
-	randomStep = canvas.width * 70 / 100;
-}
 
-/**
- * NOTE:
- * the size for the cell field, comes from the size of the square, 
- * which is put when you click
- * ctx.fillStyle - color for square
- */
-function setCellFieldSize() {
-	canvas.style.backgroundSize = POINT_SIZE + 'px ' + POINT_SIZE + 'px';
-}
 
-function setPointColor() {
-	ctx.fillStyle = COLOR_GREEN;
-	// TODO: think of random colors...
-}
 
-function DisabledButtons() {
-	pausePlay.disabled = true;
-}
 
-// NOTE: creating global empty array, our field for points
-export let field = function field() {
-	let field = [];
-	return field;
-}
 
 // ---
 
@@ -106,10 +153,12 @@ function getReloadSheet() {
 
 // NOTE: general function
 function clearField() {	
-	for (let i = 0; i < fieldSquare; i++) {
+	let field = model.getField();
+
+	for (let i = 0; i < model.fieldSquare; i++) {
 		field[i] = [];
 
-		for (let j = 0; j < fieldSquare; j++) {
+		for (let j = 0; j < model.fieldSquare; j++) {
 			field[i][j] = 0;
 		}
 	}
@@ -119,45 +168,38 @@ clearField();
 // ---
 
 // NOTE: general function
-function checkEmptyField() {	
-	for (let i = 0; i < fieldSquare; i++) {
-		for (let j = 0; j < fieldSquare; j++) {
+function checkEmptyField() {
+	let field = model.getField();
+
+	for (let i = 0; i < model.fieldSquare; i++) {
+		for (let j = 0; j < model.fieldSquare; j++) {
 			if (field[i][j] != 0) {
 				statusField++;
 			}
 		}
 	}
 
-	countPoint.innerHTML = statusField;
+	// countPoint.innerHTML = statusField;
 }
 
 // ---
 
 export function getFieldSize() {
 	proportionHeightWidth();
-	randomFillNewSize();
 	setNewField();
 
 	function proportionHeightWidth() {
-		if (fieldWidth.value < fieldHeight.value) { 
-			fieldWidth.value = fieldHeight.value;
+		if (model.fieldWidth.value < model.fieldHeight.value) { 
+			model.fieldWidth.value = model.fieldHeight.value;
 		}
 
-		canvas.width = fieldWidth.value;
-		canvas.height = fieldHeight.value;
-	}
-
-	function randomFillNewSize() {
-		if (canvas.width > canvas.height || canvas.width == canvas.height) {
-			randomStep = canvas.width * 70 / 100;
-		} else {
-			randomStep = canvas.height * 70 / 100;
-			console.log('randomStep: ' + randomStep);
-		}
+		canvas.width = model.fieldWidth.value;
+		canvas.height = model.fieldHeight.value;
 	}
 
 	function setNewField() {
-		fieldSquare = canvas.width * 1 / POINT_SIZE * 1;	
+		let pointSize = model.getSizePoint();
+		model.fieldSquare = canvas.width * 1 / pointSize * 1;	
 		getReloadSheet();
 	}
 }
@@ -167,16 +209,16 @@ export function getFieldSize() {
 export function pauseGame() {
 	if (pausePlayStatus == 0) {
 		pausePlayStatus = 1;	
-		pausePlay.innerHTML = 'Play';
+		// pausePlay.innerHTML = 'Play';
 
-		start.disabled = true;
+		// start.disabled = true;
 	} else {
 		pausePlayStatus = 0;
-		pausePlay.innerHTML = 'Pause';
+		// pausePlay.innerHTML = 'Pause';
 
 		// NOTE: in this case - continue our game
 		startLife();
-		start.disabled = false;
+		// start.disabled = false;
 	}	
 
 	(pausePlayStatus == 0) ? console.log('play') : console.log('pause');
@@ -194,8 +236,10 @@ export function randomFill() {
 
 	// NOTE: clear field
 	function getClearFieldBeforeRandom() {
-		for (let i = 0; i < fieldSquare; i++) {
-			for (let j = 0; j < fieldSquare; j++) {			
+		let field = model.getField();
+
+		for (let i = 0; i < model.fieldSquare; i++) {
+			for (let j = 0; j < model.fieldSquare; j++) {			
 				statusField = 0;
 				field[i][j] = 0;
 			}
@@ -204,7 +248,7 @@ export function randomFill() {
 
 	function setData() {
 		randomStatus = 1;
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		model.setCtxClear();		
 		
 		max = getMaxFieldSize();
 		min = 1;
@@ -212,11 +256,14 @@ export function randomFill() {
 
 	// NOTE: filling the playing field with randomly generated numbers
 	function getRandomGenerated() {	
-		for (let i = 0; i < randomStep; i++) {
+		let pointSize = model.getSizePoint();
+		let field = model.getField();
+
+		for (let i = 0; i < model.randomStep; i++) {
 			let randX = Math.round(Math.random() * (max - min) + min);
 			let randY = Math.round(Math.random() * (max - min) + min);
-			randX = Math.floor(randX / POINT_SIZE);
-			randY = Math.floor(randY / POINT_SIZE);
+			randX = Math.floor(randX / pointSize);
+			randY = Math.floor(randY / pointSize);
 
 			field[randY][randX] = 1;
 			drawField();
@@ -251,7 +298,7 @@ export function startGame() {
 		preparingPlay();
 
 		startStatus = 1;
-		startStop.innerHTML = 'Stop';
+		// startStop.innerHTML = 'Stop';
 
 		console.log('startStatus: ' + startStatus);
 	} else {		
@@ -267,11 +314,11 @@ export function startGame() {
 	function preparingPlay() {
 		if (statusField > 1) {
 			statusFieldReset = 0;
-			pausePlay.disabled = false;
+			// pausePlay.disabled = false;
 
 			startLife();			
 		} else {
-			alert('Нужно больше точек...');
+			// alert('Нужно больше точек...');
 			return;
 		}
 	}	
@@ -291,19 +338,17 @@ export function resetGame() {
 	statusFieldReset = 1;
 	pausePlayStatus = 1;		
 
-	pausePlay.innerHTML = 'Pause';
-	startStop.innerHTML = 'Play';
-	countCycle.innerHTML = count + ' | ';
-	countLife.innerHTML = counterLife  + ' | ';
-	countDead.innerHTML = counterDead + ' | ';
-	countPoint.innerHTML = statusField;	
+	// pausePlay.innerHTML = 'Pause';
+	// startStop.innerHTML = 'Play';
+	// countCycle.innerHTML = count + ' | ';
+	// countLife.innerHTML = counterLife  + ' | ';
+	// countDead.innerHTML = counterDead + ' | ';
+	// countPoint.innerHTML = statusField;	
 	
-	pausePlay.disabled = true;
-	startStop.disabled = false;
+	// pausePlay.disabled = true;
+	// startStop.disabled = false;
 
-	clearField();
-	drawField();
-
+	clearField();	
 	console.log('RESET: (statusFieldReset): ' + statusFieldReset);
 }
 
@@ -315,14 +360,15 @@ function startLife() {
 	let neighbors = 0;
 	let fieldTemp = [];
 	let isAlive = [];
+	let field = model.getField();
 
 	gameLoop();
 
 	function gameLoop() {
 		if (pausePlayStatus == 0  && statusFieldReset == 0) {		
-			for (i = 0; i < fieldSquare; i++) {			
+			for (i = 0; i < model.fieldSquare; i++) {			
 				fieldTemp[i] = [];			
-				for (j = 0; j < fieldSquare; j++) {				
+				for (j = 0; j < model.fieldSquare; j++) {				
 					neighbors = 0;
 					setCountNeighbors();
 
@@ -347,12 +393,6 @@ function startLife() {
 		let bottomRight = field[rightFieldOut(i) + 1][rightFieldOut(j) + 1];
 		let bottomLeft = field[rightFieldOut(i) + 1][topFieldOut(j) - 1];
 		let topLeft = field[topFieldOut(i) - 1][topFieldOut(j) - 1];		
-
-		// if ((top == 1) || (right == 1) || (bottom == 1) || (left == 1) || 
-		// 		(topRight == 1) || (bottomRight == 1) || (bottomLeft == 1) || (topLeft == 1)) {
-		// 	neighbors++;
-		// } 
-		
 		
 		if (top == 1) { 
 			neighbors++;			
@@ -385,63 +425,6 @@ function startLife() {
 		if (topLeft == 1) { 
 			neighbors++;			
 		}
-		
-		// NOTE: ↑ || → || ↓ || ← || ↗ || ↘ || ↙ || ↖
-		// if ((field[topFieldOut(i) - 1][j] == 1) || (field[i][rightFieldOut(j) + 1] == 1)) { 
-		// 	neighbors++;
-		// }
-		
-		// if ((field[rightFieldOut(i) + 1][j] == 1) || (field[i][topFieldOut(j) - 1] == 1)) { 
-		// 	neighbors++;
-		// }
-				
-		// if ((field[topFieldOut(i) - 1][rightFieldOut(j) + 1] == 1) || (field[rightFieldOut(i) + 1][rightFieldOut(j) + 1] == 1)) {
-		// 	neighbors++;
-		// }
-
-		// if ((field[rightFieldOut(i) + 1][topFieldOut(j) - 1] == 1) || (field[topFieldOut(i) - 1][topFieldOut(j) - 1] == 1)) {
-		// 	neighbors++;
-		// }
-
-		// // NOTE: ↑
-		// if (field[topFieldOut(i) - 1][j] == 1) {
-		// 	neighbors++;
-		// } 
-
-		// // NOTE: →
-		// if (field[i][rightFieldOut(j) + 1] == 1) { 
-		// 	neighbors++;
-		// }
-		
-		// // NOTE: ↓
-		// if (field[rightFieldOut(i) + 1][j] == 1) {
-		// 	neighbors++;
-		// }
-		
-		// // NOTE: ←
-		// if (field[i][topFieldOut(j) - 1] == 1) {
-		// 	neighbors++;
-		// }
-		
-		// // NOTE: ↗
-		// if (field[topFieldOut(i) - 1][rightFieldOut(j) + 1] == 1) {
-		// 	neighbors++;
-		// }
-		
-		// // NOTE: ↘
-		// if (field[rightFieldOut(i) + 1][rightFieldOut(j) + 1] == 1) {
-		// 	neighbors++;
-		// }
-		
-		// // NOTE: ↙
-		// if (field[rightFieldOut(i) + 1][topFieldOut(j) - 1] == 1) {
-		// 	neighbors++;
-		// }
-		
-		// // NOTE: ↖
-		// if (field[topFieldOut(i) - 1][topFieldOut(j) - 1] == 1) {
-		// 	neighbors++;
-		// }
 	}
 
 	function getCheckNeighbors() {
@@ -503,7 +486,7 @@ function startLife() {
 	// NOTE: take into account the output of the field from the top
 	function topFieldOut(i) {
 		if (i == 0) {
-			return fieldSquare;
+			return model.fieldSquare;
 		}
 
 		return i;
@@ -511,7 +494,7 @@ function startLife() {
 
 	// NOTE: take into account the output of the field from the right
 	function rightFieldOut(i) {
-		if (i == fieldSquare * 1 - 1) {
+		if (i == model.fieldSquare * 1 - 1) {
 			return -1; 
 		}
 
@@ -529,7 +512,7 @@ function startLife() {
 		checkEmptyField();
 		
 		// NOTE: timer for drawing
-		setTimeout(startLife, speedGame.value);
+		setTimeout(startLife, this.speedGame.value);
 	}
 
 	return;	
@@ -545,10 +528,12 @@ function startLife() {
 canvas.onclick = function clickMouseButton(event) {	
 	let x;
 	let y;
+	let pointSize = model.getSizePoint();
+	let field = model.getField();
 
 	setData();
 	getPointField();
-	drawField();
+	// drawField();
 	console.log(field);
 
 	/**
@@ -557,13 +542,13 @@ canvas.onclick = function clickMouseButton(event) {
 	 * from 10 to 20 - second, etc.
 	 * 300 / 10 = 30 cubes, then round to the bottom
 	 */
-	function setData() {
+	function setData() {		
 		x = event.offsetX;
 		y = event.offsetY;
 		console.log('offsetX: ' + x + ' | ' + 'offsetY: ' + y);	
 		
-		x = Math.floor(x / POINT_SIZE);
-		y = Math.floor(y / POINT_SIZE);
+		x = Math.floor(x / pointSize);
+		y = Math.floor(y / pointSize);
 		console.log('X: ' + x + ' | ' + 'Y: ' + y);	
 	}
 
