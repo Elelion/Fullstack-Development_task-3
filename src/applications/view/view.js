@@ -143,6 +143,80 @@ export function startGame() {
 	}	
 }
 
+function getCheckPointsField() {
+	if (statusField < 1 && randomStatus == 0) {
+		alert('GameOver man!. Все точки сдохли, плодиться не кому.');					
+		let request = prompt('Введите: НЕТ - что бы остаться на страничке', '');
+
+		switch (request) {
+			case 'ДА': 
+				getReloadSheet();
+				break;
+
+			case 'НЕТ': case 'Нет': case 'нет': case 'НеТ': 
+			case 'НЕт': case 'неТ': case 'нЕт':
+				pausePlay.disabled = true;
+				startStop.disabled = false;
+				// clearTimeout(handle);
+				break;
+
+			default: 
+				alert('Некорректное действие, страница будет перезагружена');
+				getReloadSheet();
+				break;
+		}
+
+		return;
+	}
+}
+
+// ---
+
+getCheckNeighbors() {
+	if (this.isAlive == 0 && this.neighbors === 3) {
+		fieldTemp[i][j] = 1;
+		counterLife++;
+		countLife.innerHTML = counterLife  + ' | ';
+	} else {
+		if (this.isAlive == 1 && (this.neighbors === 3 || this.neighbors === 2)) {
+			fieldTemp[i][j] = 1; 
+			counterLife++;
+			countLife.innerHTML = counterLife  + ' | ';
+		} else {
+			if (this.isAlive == 1 && this.neighbors > 3) {
+				fieldTemp[i][j] = 0;
+				counterDead++;
+				countDead.innerHTML = counterDead  + ' | ';
+			} else {
+				if (this.isAlive == 1 && this.neighbors < 2) {
+					fieldTemp[i][j] = 0;
+					counterDead++;
+					countDead.innerHTML = counterDead  + ' | ';
+				} else { 
+					fieldTemp[i][j] = 0; counterDead++;
+						countDead.innerHTML = counterDead + ' | ';
+				}
+			}
+		}
+	}
+}
+
+// ---
+
+setLifeData() {
+	// this.field = this.fieldTemp;
+	drawField();
+	// statusField = 0;
+	// randomStatus = 0;
+	// count++;
+	countCycle.innerHTML = count + ' | ';
+	countPoint.innerHTML = statusField;
+	// model.checkEmptyField();
+	
+	// NOTE: timer for drawing
+	// setTimeout(startLife, this.speedGame.value);
+}
+
 // ---
 
 export function resetGame() {
@@ -173,3 +247,32 @@ export function resetGame() {
 
 // ---
 
+canvas.onclick = function clickMouseButton(event) {	
+	let x;
+	let y;
+	let pointSize = this.getSizePoint();
+	let field = this.getField();
+
+	setData();
+	getPointField();
+	// drawField();
+	console.log(field);
+}
+
+	function setData() {		
+		x = event.offsetX;
+		y = event.offsetY;
+		console.log('offsetX: ' + x + ' | ' + 'offsetY: ' + y);	
+		
+		x = Math.floor(x / pointSize);
+		y = Math.floor(y / pointSize);
+		console.log('X: ' + x + ' | ' + 'Y: ' + y);	
+	}
+
+	function getPointField() {
+		if (field[y][x] == 0) {
+			field[y][x] = 1;
+		} else {
+			field[y][x] = 0;
+		}
+	}

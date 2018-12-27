@@ -17,7 +17,7 @@ export class getEventsElementsDOM {
 	constructor() {
 		// events for the buttons & fields
 		this.buttonStart = 
-			document.getElementsByClassName('start')[0].onclick = startGame;
+			document.getElementsByClassName('start')[0].onclick = model.startGame;
 
 		this.buttonRandom = 
 			document.getElementsByClassName('random')[0].onclick = model.getRandomFill;

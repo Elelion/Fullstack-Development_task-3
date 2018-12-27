@@ -12,7 +12,7 @@ export class Model {
 		this.counterDead = 0;
 		this.pausePlayStatus = 0;
 		this.max = 0;
-		this.min = 0;
+		this.min = 0;		
 
 		/**
 		 * NOTE:
@@ -25,6 +25,17 @@ export class Model {
 		this.statusFieldReset = 0;
 		this.randomStatus = 0;
 		this.startStatus = 0;
+		
+		// NOTE: for coordinates X and Y
+		this.setX = 0;
+		this.setY = 0;
+
+		// NOTE: for gaming cycle
+		this.neighbors = 0;
+		this.i = 0;
+		this.j = 0;
+		this.fieldTemp = [];
+		this.isAlive = [];
 
 		// NOTE: creating global empty array, our field for points
 		this.field = [];
@@ -39,6 +50,7 @@ export class Model {
 		this.setWidthHeightCanvas();
 		this.setCellFieldSize();
 		this.clearField();
+		this.getCanvasClickEvents();
 	}	
 
 	// ---
@@ -299,6 +311,8 @@ export class Model {
 			// startStop.innerHTML = 'Start';
 			// console.log('startStatus: ' + startStatus);		
 		}
+
+		return;
 	}
 
 	preparingPlay() {
@@ -312,225 +326,175 @@ export class Model {
 
 	// ---
 
-	startLife() {
-		let i = 0;
-		let j = 0;
-		let neighbors = 0;
-		let fieldTemp = [];
-		let isAlive = [];
+	startLife() {		
 		this.field = model.getField();
 
-		gameLoop();
+		if (this.pausePlayStatus == 0  && this.statusFieldReset == 0) {		
+			for (this.i = 0; this.i < this.fieldSquare; this.i++) {			
+				this.fieldTemp[i] = [];			
+				for (this.j = 0; this.j < this.fieldSquare; this.j++) {				
+					this.neighbors = 0;
+					setCountNeighbors();
 
-		function gameLoop() {
-			if (pausePlayStatus == 0  && statusFieldReset == 0) {		
-				for (i = 0; i < model.fieldSquare; i++) {			
-					fieldTemp[i] = [];			
-					for (j = 0; j < model.fieldSquare; j++) {				
-						neighbors = 0;
-						setCountNeighbors();
+					// NOTE: this is the current state with points
+					this.isAlive = this.field[i][j];
 
-						// NOTE: this is the current state with points
-						isAlive = field[i][j];
-
-						getCheckNeighbors();
-						getCheckPointsField();
-					}
+					getCheckNeighbors();
+					getCheckPointsField();
 				}
-				
-				setData();
 			}
-		}
-
-		function setCountNeighbors() {
-			let top = field[topFieldOut(i) - 1][j];
-			let right = field[i][rightFieldOut(j) + 1];
-			let bottom = field[rightFieldOut(i) + 1][j];
-			let left = field[i][topFieldOut(j) - 1];
-			let topRight = field[topFieldOut(i) - 1][rightFieldOut(j) + 1];
-			let bottomRight = field[rightFieldOut(i) + 1][rightFieldOut(j) + 1];
-			let bottomLeft = field[rightFieldOut(i) + 1][topFieldOut(j) - 1];
-			let topLeft = field[topFieldOut(i) - 1][topFieldOut(j) - 1];		
 			
-			if (top == 1) { 
-				neighbors++;			
-			}
-
-			if (right == 1) { 
-				neighbors++;			
-			}
-
-			if (bottom == 1) { 
-				neighbors++;			
-			}
-
-			if (left == 1) { 
-				neighbors++;			
-			}
-
-			if (topRight == 1) { 
-				neighbors++;			
-			}
-
-			if (bottomRight == 1) { 
-				neighbors++;			
-			}
-
-			if (bottomLeft == 1) { 
-				neighbors++;			
-			}
-
-			if (topLeft == 1) { 
-				neighbors++;			
-			}
+			setLifeData();
 		}
-
-		function getCheckNeighbors() {
-			if (isAlive == 0 && neighbors === 3) {
-				fieldTemp[i][j] = 1;
-				counterLife++;
-				countLife.innerHTML = counterLife  + ' | ';
-			} else {
-				if (isAlive == 1 && (neighbors === 3 || neighbors === 2)) {
-					fieldTemp[i][j] = 1; 
-					counterLife++;
-					countLife.innerHTML = counterLife  + ' | ';
-				} else {
-					if (isAlive == 1 && neighbors > 3) {
-						fieldTemp[i][j] = 0;
-						counterDead++;
-						countDead.innerHTML = counterDead  + ' | ';
-					} else {
-						if (isAlive == 1 && neighbors < 2) {
-							fieldTemp[i][j] = 0;
-							counterDead++;
-							countDead.innerHTML = counterDead  + ' | ';
-						} else { 
-							fieldTemp[i][j] = 0; counterDead++;
-								countDead.innerHTML = counterDead + ' | ';
-						}
-					}
-				}
-			}
-		}
-
-		function getCheckPointsField() {
-			if (statusField < 1 && randomStatus == 0) {
-				alert('GameOver man!. Все точки сдохли, плодиться не кому.');					
-				let request = prompt('Введите: НЕТ - что бы остаться на страничке', '');
-
-				switch (request) {
-					case 'ДА': 
-						getReloadSheet();
-						break;
-
-					case 'НЕТ': case 'Нет': case 'нет': case 'НеТ': 
-					case 'НЕт': case 'неТ': case 'нЕт':
-						pausePlay.disabled = true;
-						startStop.disabled = false;
-						clearTimeout(handle);
-						break;
-
-					default: 
-						alert('Некорректное действие, страница будет перезагружена');
-						getReloadSheet();
-						break;
-				}
-
-				return;
-			}
-		}
-
-		// NOTE: take into account the output of the field from the top
-		function topFieldOut(i) {
-			if (i == 0) {
-				return model.fieldSquare;
-			}
-
-			return i;
-		}
-
-		// NOTE: take into account the output of the field from the right
-		function rightFieldOut(i) {
-			if (i == model.fieldSquare * 1 - 1) {
-				return -1; 
-			}
-
-			return i;
-		}
-
-		function setData() {
-			field = fieldTemp;
-			drawField();				
-			statusField = 0;
-			randomStatus = 0;
-			count++;
-			countCycle.innerHTML = count + ' | ';
-			countPoint.innerHTML = statusField;
-			model.checkEmptyField();
-			
-			// NOTE: timer for drawing
-			setTimeout(startLife, this.speedGame.value);
-		}
-
-		return;	
 	}
 
-}
-// ----------------------------------------------------------------------------
+	setCountNeighbors() {
+		let top = this.field[this.setTopFieldOut(i) - 1][j];
+		let right = this.field[i][this.setRightFieldOut(j) + 1];
+		let bottom = this.field[this.setRightFieldOut(i) + 1][j];
+		let left = this.field[i][this.setTopFieldOut(j) - 1];
+		let topRight = this.field[this.setTopFieldOut(i) - 1][this.setRightFieldOut(j) + 1];
+		let bottomRight = this.field[this.setRightFieldOut(i) + 1][this.setRightFieldOut(j) + 1];
+		let bottomLeft = this.field[this.setRightFieldOut(i) + 1][this.setTopFieldOut(j) - 1];
+		let topLeft = this.field[this.setTopFieldOut(i) - 1][this.setTopFieldOut(j) - 1];		
+		
+		if (top == 1) { 
+			this.neighbors++;			
+		}
 
+		if (right == 1) { 
+			this.neighbors++;			
+		}
 
+		if (bottom == 1) { 
+			this.neighbors++;			
+		}
 
+		if (left == 1) { 
+			this.neighbors++;			
+		}
 
+		if (topRight == 1) { 
+			this.neighbors++;			
+		}
 
+		if (bottomRight == 1) { 
+			this.neighbors++;			
+		}
 
+		if (bottomLeft == 1) { 
+			this.neighbors++;			
+		}
 
+		if (topLeft == 1) { 
+			this.neighbors++;			
+		}
+	}
 
+	getCheckNeighbors() {
+		if (this.isAlive == 0 && this.neighbors === 3) {
+			this.fieldTemp[i][j] = 1;
+			this.counterLife++;
+		} else {
+			if (this.isAlive == 1 && (this.neighbors === 3 || this.neighbors === 2)) {
+				this.fieldTemp[i][j] = 1; 
+				this.counterLife++;				
+			} else {
+				if (this.isAlive == 1 && this.neighbors > 3) {
+					this.fieldTemp[i][j] = 0;
+					this.counterDead++;					
+				} else {
+					if (this.isAlive == 1 && this.neighbors < 2) {
+						this.fieldTemp[i][j] = 0;
+						this.counterDead++;						
+					} else { 
+						this.fieldTemp[i][j] = 0; 
+						this.counterDead++;							
+					}
+				}
+			}
+		}
+	}
 
+	getCounterLife() {
+		return this.counterLife;
+	}
 
+	getCheckPointsField() {
+		if (this.statusField < 1 && this.randomStatus == 0) {				
+			clearTimeout(handle);						
+		}
+	
+		return;
+	}
 
+	// NOTE: take into account the output of the field from the top
+	setTopFieldOut(i) {
+		if (i == 0) {
+			return this.fieldSquare;
+		}
 
+		return i;
+	}
+
+	// NOTE: take into account the output of the field from the right
+	setRightFieldOut(i) {
+		if (i == this.fieldSquare * 1 - 1) {
+			return -1; 
+		}
+
+		return i;
+	}
+
+	setLifeData() {
+		this.field = this.fieldTemp;		
+		statusField = 0;
+		randomStatus = 0;
+		count++;		
+		this.checkEmptyField();
+		
+		// NOTE: timer for drawing
+		setTimeout(this.startLife, this.speedGame.value);
+	}
 
 // ---
 
-/**
- * NOTE:
- * we hang the click event on canvas, where the event indicates that 
- * we will work with the event
- */
-canvas.onclick = function clickMouseButton(event) {	
-	let x;
-	let y;
-	let pointSize = model.getSizePoint();
-	let field = model.getField();
-
-	setData();
-	getPointField();
-	// drawField();
-	console.log(field);
-
 	/**
 	 * NOTE:
+	 * we hang the click event on canvas, where the event indicates that 
+	 * we will work with the event
+	 *
 	 * fields from 0 to 10 will belong to the first cube, 
 	 * from 10 to 20 - second, etc.
 	 * 300 / 10 = 30 cubes, then round to the bottom
-	 */
-	function setData() {		
-		x = event.offsetX;
-		y = event.offsetY;
-		console.log('offsetX: ' + x + ' | ' + 'offsetY: ' + y);	
+	 */	
+	clickMouseButton(event) {		
+		this.setX = event.offsetX;
+		this.setY = event.offsetY;
+		let pointSize = this.getSizePoint();
+
+		console.log('offsetX: ' + this.setX + ' | ' + 'offsetY: ' + this.setY);	
 		
-		x = Math.floor(x / pointSize);
-		y = Math.floor(y / pointSize);
-		console.log('X: ' + x + ' | ' + 'Y: ' + y);	
+		this.setX = Math.floor(this.setX / pointSize);
+		y = Math.floor(this.setY / pointSize);
+		console.log('X: ' + this.setX + ' | ' + 'Y: ' + this.setY);	
+
+		getPointField();
+		// drawField();
+		console.log(this.field);
 	}
 
 	// NOTE: Filling the playing field, where we click, there will be ONE
-	function getPointField() {
-		if (field[y][x] == 0) {
-			field[y][x] = 1;
+	getPointField() {
+		if (this.field[this.setY][this.setX] == 0) {
+			this.field[this.setY][this.setX] = 1;
 		} else {
-			field[y][x] = 0;
+			this.field[this.setY][this.setX] = 0;
 		}
+	}
+
+	getCanvasClickEvents() {
+		this.canvas.onclick = clickMouseButton(event);
+		return; 
 	}
 }
