@@ -48,6 +48,8 @@ export class View {
 		setClearRect() {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 		}	
+
+
 }
 
 // ---

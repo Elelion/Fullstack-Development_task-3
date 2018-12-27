@@ -1,7 +1,0 @@
-{
-"version": 3,
-"mappings": "AAAA,eAAe;EACb,MAAM,EAAE,iBAAiB;EACzB,QAAQ,EAAE,MAAM;EAChB,MAAM,EAAE,IAAI;EACZ,UAAU,EAAE,UAAU;EACtB,UAAU,EAAE,+FAA+F;EAC3G,gBAAgB,EAAE,KAAK",
-"sources": ["field.sass"],
-"names": [],
-"file": "field.sass"
-}

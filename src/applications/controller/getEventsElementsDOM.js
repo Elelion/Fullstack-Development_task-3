@@ -4,8 +4,12 @@ import {
 	startGame, 
 	randomFill, 
 	pauseGame, 
-	getFieldSize
-} from '../model/model-bak.js';		
+	// getFieldSize
+} from '../model/model-bak.js';
+
+import {Model} from '../model/model.js';
+
+const model = new Model;
 
 // ---
 
@@ -16,16 +20,16 @@ export class getEventsElementsDOM {
 			document.getElementsByClassName('start')[0].onclick = startGame;
 
 		this.buttonRandom = 
-			document.getElementsByClassName('random')[0].onclick = randomFill;
+			document.getElementsByClassName('random')[0].onclick = model.getRandomFill;
 
 		this.buttonPausePlay = 
-			document.getElementsByClassName('pause')[0].onclick = pauseGame;
+			document.getElementsByClassName('pause')[0].onclick = model.getPauseGame;
 
 		this.inputFieldWidth = 
-			document.getElementsByClassName('width')[0].onclick = getFieldSize;
+			document.getElementsByClassName('width')[0].onclick = model.getFieldSize;
 
 		this.inputFieldHeight = 
-			document.getElementsByClassName('height')[0].onclick = getFieldSize;
+			document.getElementsByClassName('height')[0].onclick = model.getFieldSize;
 	}		
 
 	// disable input for edits
