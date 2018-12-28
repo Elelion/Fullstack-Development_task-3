@@ -1,15 +1,8 @@
 /* jshint esversion: 6 */
 
-import {
-	startGame, 
-	randomFill, 
-	pauseGame, 
-	// getFieldSize
-} from '../model/model-bak.js';
-
 import {Model} from '../model/model.js';
 
-const model = new Model;
+const model = new Model();
 
 // ---
 
@@ -17,19 +10,19 @@ export class getEventsElementsDOM {
 	constructor() {
 		// events for the buttons & fields
 		this.buttonStart = 
-			document.getElementsByClassName('start')[0].onclick = model.startGame;
+			document.getElementsByClassName('start')[0].onclick = model.startGame();
 
 		this.buttonRandom = 
-			document.getElementsByClassName('random')[0].onclick = model.getRandomFill;
+			document.getElementsByClassName('random')[0].onclick = model.getRandomFill();
 
 		this.buttonPausePlay = 
-			document.getElementsByClassName('pause')[0].onclick = model.getPauseGame;
+			document.getElementsByClassName('pause')[0].onclick = model.getPauseGame();
 
 		this.inputFieldWidth = 
-			document.getElementsByClassName('width')[0].onclick = model.getFieldSize;
+			document.getElementsByClassName('width')[0].onclick = model.getFieldSize();
 
 		this.inputFieldHeight = 
-			document.getElementsByClassName('height')[0].onclick = model.getFieldSize;
+			document.getElementsByClassName('height')[0].onclick = model.getFieldSize();
 	}		
 
 	// disable input for edits

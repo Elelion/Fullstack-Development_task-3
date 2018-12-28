@@ -4,7 +4,7 @@ export class Model {
 	constructor() {
 		this.ctx;
 		this.fieldSquare;
-		this.pointSize;
+		this.pointSize;		
 		this.randomStep;	
 
 		this.count = 0;
@@ -27,8 +27,10 @@ export class Model {
 		this.startStatus = 0;
 		
 		// NOTE: for coordinates X and Y
-		this.setX = 0;
-		this.setY = 0;
+		// this.setX = 0;
+		// this.setY = 0;
+		this.xPos = 0;
+		this.yPos = 0;
 
 		// NOTE: for gaming cycle
 		this.neighbors = 0;
@@ -46,7 +48,7 @@ export class Model {
 		this.canvas = document.getElementsByClassName('grid__gradient')[0];		
 
 		this.setCtx();
-		this.setFieldSquare();
+		this.getFieldSquare();
 		this.setWidthHeightCanvas();
 		this.setCellFieldSize();
 		this.clearField();
@@ -75,12 +77,9 @@ export class Model {
 
 	// ---
 
-	// DEBIGGING: get for view
 	setSizePoint(size) {
-		this.pointSize = size;
-	}
-
-	// ---
+		return this.pointSize = size;
+	}	
 
 	getSizePoint() {
 		return this.pointSize;
@@ -88,10 +87,21 @@ export class Model {
 
 	// ---
 
+	setStatusField(status) {
+		return this.statusField = status;
+	}	
+
+	getStatusField() {
+		return this.statusField;
+	}
+
+	// ---
+
 	// NOTE: 300 / 10 = 30, it is array will have 30х30
-	setFieldSquare() {
-		let pointSize = model.getSizePoint();
+	getFieldSquare() {
+		let pointSize = this.getSizePoint();
 		this.fieldSquare = this.canvas.width * 1 / pointSize * 1;
+		return this.fieldSquare;
 	}
 
 	// ---
@@ -128,20 +138,18 @@ export class Model {
 	 * ctx.fillStyle - color for square
 	 */
 	setCellFieldSize() {
-		let pointSize = model.getSizePoint();
+		let pointSize = this.pointSize;
 		this.canvas.style.backgroundSize = pointSize + 'px ' + pointSize + 'px';
 	}
 
 	// ---
 	
-	getField() {
-		return this.field;
+	setField(element1, element2, value) {
+		return this.field[element1][element2] = value;
+	}
 
-		// FIXME: think... is there a need?
-		// export let field = function field() {
-		// 	let field = [];
-		// 	return field;
-		// }
+	getField() {
+		return this.field;	
 	}
 
 	// ---
@@ -157,20 +165,19 @@ export class Model {
 		this.statusFieldReset = 1;
 		this.pausePlayStatus = 1;
 
-		clearField();	
+		clearField();
+		this.getDrawField();
 		console.log('RESET: (statusFieldReset): ' + statusFieldReset);
 	}
 
 	// ---
 
-	clearField() {	
-		let field = this.getField();
-
+	clearField() {			
 		for (let i = 0; i < this.fieldSquare; i++) {
-			field[i] = [];
+			this.field[i] = [];
 
 			for (let j = 0; j < this.fieldSquare; j++) {
-				field[i][j] = 0;
+				this.field[i][j] = 0;
 			}
 		}
 	}	
@@ -178,19 +185,19 @@ export class Model {
 	// ---
 
 	getReloadSheet() {
-		location.reload();
+		// location.reload();
 	}
 
 	// ---
 	
 	// NOTE: general function
 	checkEmptyField() {
-		let field = this.getField();
+		// let field = this.getField();
 
 		for (let i = 0; i < this.fieldSquare; i++) {
 			for (let j = 0; j < this.fieldSquare; j++) {
-				if (field[i][j] != 0) {
-					statusField++;
+				if (this.field[i][j] != 0) {
+					this.statusField++;
 				}
 			}
 		}
@@ -213,9 +220,9 @@ export class Model {
 	}
 
 	setNewField() {
-		let pointSize = this.getSizePoint();
+		let pointSize = this.pointSize;
 		this.fieldSquare = this.canvas.width * 1 / pointSize * 1;	
-		getReloadSheet();
+		this.getReloadSheet();
 	}
 
 	// ---
@@ -228,25 +235,26 @@ export class Model {
 			startLife();			
 		}	
 	
-		(pausePlayStatus == 0) ? console.log('play') : console.log('pause');
+		(this.pausePlayStatus == 0) ? console.log('play') : console.log('pause');
 	}
 	
 	// ---
 
 	getRandomFill() {	
-		getClearFieldBeforeRandom();
-		getMaxRandomNumber();
-		getRandomGenerated();
+		this.getClearFieldBeforeRandom();
+		this.getMaxRandomNumber();
+		this.getRandomGenerated();
 	}
 
 	// NOTE: clear field
 	getClearFieldBeforeRandom() {
-		this.field = this.getField();
+		let fieldSquare = this.getFieldSquare();
 
-		for (let i = 0; i < this.fieldSquare; i++) {
-			for (let j = 0; j < this.fieldSquare; j++) {			
-				this.statusField = 0;
-				this.field[i][j] = 0;
+		for (let i = 0; i < fieldSquare; i++) {
+			for (let j = 0; j < fieldSquare; j++) {				
+				this.setStatusField('0');
+				this.setField(i, j, '0');
+				// this.field[i][j] = 0;
 			}
 		}
 	}
@@ -280,16 +288,17 @@ export class Model {
 
 	// NOTE: filling the playing field with randomly generated numbers
 	getRandomGenerated() {	
-		let pointSize = this.getSizePoint();
-		this.field = this.getField();
+		let pointSize = this.pointSize;
+		// this.field = this.getField();
 
-		for (let i = 0; i < model.randomStep; i++) {
+		for (let i = 0; i < this.randomStep; i++) {
 			let randX = Math.round(Math.random() * (this.max - this.min) + this.min);
 			let randY = Math.round(Math.random() * (this.max - this.min) + this.min);
 			randX = Math.floor(randX / pointSize);
 			randY = Math.floor(randY / pointSize);
 
-			this.field[randY][randX] = 1;			
+			this.field[randY][randX] = 1;
+			this.getDrawField();
 		}
 	}
 	
@@ -300,8 +309,8 @@ export class Model {
 			this.checkEmptyField();
 			this.preparingPlay();
 	
-			startStatus = 1;			
-			console.log('startStatus: ' + startStatus);
+			this.startStatus = 1;			
+			console.log('startStatus: ' + this.startStatus);
 		} else {		
 			this.resetGame();
 			getReloadSheet();
@@ -326,9 +335,7 @@ export class Model {
 
 	// ---
 
-	startLife() {		
-		this.field = model.getField();
-
+	startLife() {
 		if (this.pausePlayStatus == 0  && this.statusFieldReset == 0) {		
 			for (this.i = 0; this.i < this.fieldSquare; this.i++) {			
 				this.fieldTemp[i] = [];			
@@ -448,6 +455,7 @@ export class Model {
 
 	setLifeData() {
 		this.field = this.fieldTemp;		
+		this.getDrawField();
 		statusField = 0;
 		randomStatus = 0;
 		count++;		
@@ -457,7 +465,7 @@ export class Model {
 		setTimeout(this.startLife, this.speedGame.value);
 	}
 
-// ---
+	// ---
 
 	/**
 	 * NOTE:
@@ -468,33 +476,123 @@ export class Model {
 	 * from 10 to 20 - second, etc.
 	 * 300 / 10 = 30 cubes, then round to the bottom
 	 */	
-	clickMouseButton(event) {		
-		this.setX = event.offsetX;
-		this.setY = event.offsetY;
-		let pointSize = this.getSizePoint();
-
-		console.log('offsetX: ' + this.setX + ' | ' + 'offsetY: ' + this.setY);	
+	getCanvasClickEvents() {
+		this.canvas.onclick = function clickMouseButton(event) {
+			this.xPos = event.offsetX;
+			this.yPos = event.offsetY;
+			let pointSize = this.getSizePoint;
+			alert(pointSize);
+	
+			console.log('offsetX: ' + this.xPos + ' | ' + 'offsetY: ' + this.yPos);	
+			
+			this.xPos = Math.floor(this.setX / pointSize);
+			this.yPos = Math.floor(this.yPos / pointSize);
+			console.log('X: ' + this.xPos + ' | ' + 'Y: ' + this.yPos);	
+	
+			this.getPointField();
+			this.getDrawField();
+			console.log(this.field);
+		}		
 		
-		this.setX = Math.floor(this.setX / pointSize);
-		y = Math.floor(this.setY / pointSize);
-		console.log('X: ' + this.setX + ' | ' + 'Y: ' + this.setY);	
-
-		getPointField();
-		// drawField();
-		console.log(this.field);
+		// return; 
 	}
 
 	// NOTE: Filling the playing field, where we click, there will be ONE
 	getPointField() {
-		if (this.field[this.setY][this.setX] == 0) {
-			this.field[this.setY][this.setX] = 1;
+		if (this.field[this.yPos][this.xPos] == 0) {
+			this.field[this.yPos][this.xPos] = 1;
 		} else {
-			this.field[this.setY][this.setX] = 0;
+			this.field[this.yPos][this.xPos] = 0;
 		}
+		// return;
 	}
 
-	getCanvasClickEvents() {
-		this.canvas.onclick = clickMouseButton(event);
-		return; 
+	// ---
+
+	getDrawField() {
+		this.getClearRect();
+		this.getDrawPoint();
+	}
+
+	/**
+	 * NOTE:
+	 * iterate over the array, and if some element = 1, then draw
+	 * point will have a size 10x10px, if be clicked in first field
+	 * coordinates must be from 0 to 10 if second field is from 10 to 20, etc 
+	 * that is, in fact it sets a point under the mouse pointer when you click
+	 */
+	getDrawPoint() {
+		// let field = this.getField();	
+		let pointSize = this.pointSize;
+		
+		for (let i = 0; i < this.getFieldSquare; i++) {
+			for (let j = 0; j < this.getFieldSquare; j++) {
+				if (this.field[i][j] == 1) {
+					this.ctx.fillRect(j * pointSize, i * pointSize, pointSize, pointSize);
+				}
+			}
+		}	
+	}
+
+	getClearRect() {
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	}
+
+	// ==============================================================
+
+	getAlert() {		
+		let field = function field() {
+			let field = [];
+			return field;
+		}
+
+		console.log('----');
+		console.log('sizePoint: ' + this.getSizePoint());
+		console.log('fieldSquare: ' + this.getFieldSquare());
+		console.log('RandomStep: ' + this.getRandomStep());
+
+		for (let i = 0; i < 30; i++) {
+			field[i] = [];
+	
+			for (let j = 0; j < 30; j++) {
+				field[i][j] = 10;
+			}
+		}
+				
+		console.log('getField: ' + field[4][5]);
 	}
 }
+
+// ----------------------------------------------------------------------------
+
+// const model = new Model();
+// model.canvas.onclick = function clickMouseButton(event) {	
+// 	let x;
+// 	let y;
+// 	let pointSize = model.getSizePoint();
+// 	let field = model.getField();
+// 	console.log(field);
+
+// 	setData();
+// 	// getPointField();
+// 	// drawField();
+// 	// console.log(field);
+// }
+
+// 	function setData() {		
+// 		x = event.offsetX;
+// 		y = event.offsetY;
+// 		console.log('offsetX: ' + x + ' | ' + 'offsetY: ' + y);	
+		
+// 		x = Math.floor(x / pointSize);
+// 		y = Math.floor(y / pointSize);
+// 		console.log('X: ' + x + ' | ' + 'Y: ' + y);	
+// 	}
+
+	// function getPointField() {
+	// 	if (field[y][x] == 0) {
+	// 		field[y][x] = 1;
+	// 	} else {
+	// 		field[y][x] = 0;
+	// 	}
+	// }

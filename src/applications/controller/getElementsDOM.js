@@ -1,6 +1,6 @@
 /* jshint esversion: 6 */
 
-import {Model} from '../model/model.js';
+// import {Model} from '../model/model.js';
 
 // const GET_DOM = new getElementsDOM();
 
@@ -8,7 +8,7 @@ import {Model} from '../model/model.js';
 
 export class getElementsDOM {
   constructor() {
-    this.model = new Model;
+    // this.model = new Model();
 
     this.countCycle = document.getElementsByClassName('count__cycle')[0];
     this.countLife = document.getElementsByClassName('count__life')[0];
