@@ -1,6 +1,6 @@
 /* jshint esversion: 6 */
 
-import {drawField} from '../view/view.js';
+import {drawField} from '../view/drawField.js';
 import {getElementsDOM} from '../controller/getElementsDOM.js';
 
 const COLOR_GREEN = '#00FF00';
@@ -13,10 +13,10 @@ export let countDead = GET_DOM.getCountDeadDOM();
 export let pausePlay = GET_DOM.getPausePlayDOM();
 export let startStop = GET_DOM.getStartStopDOM();
 export let countPoint = GET_DOM.getCountPointDOM();
-export let speedGame = document.getElementsByClassName('speed')[0];
-export let fieldWidth = document.getElementsByClassName('width')[0];
-export let fieldHeight = document.getElementsByClassName('height')[0];
-export let canvas = document.getElementsByClassName('grid__gradient')[0];
+export let speedGame = GET_DOM.getSpeedGameDOM();
+export let fieldWidth = GET_DOM.getFieldWidthDOM();
+export let fieldHeight = GET_DOM.getFieldHeightDOM();
+export let canvas = GET_DOM.getCanvasFieldDOM();
 
 export let ctx;
 export let fieldSquare;

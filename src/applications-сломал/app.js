@@ -13,11 +13,11 @@ getEventsDOM.getDisabledInputWidth;
 getEventsDOM.getDisabledInputHeight;
 getEventsDOM.getDisabledInputSpeed;
 
-// import {Model} from './model/model.js';
-// const model = new Model();
+import {Model} from './model/model.js';
+const model = new Model();
 
-// import {View} from './view/view.js';
-// const view = new View();
+import {View} from './view/view.js';
+const view = new View();
 
-// view.getDebugging();
+view.getDebugging();
 

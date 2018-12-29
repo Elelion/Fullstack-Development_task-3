@@ -6,7 +6,7 @@ import {
 	field,
 	fieldSquare,
 	POINT_SIZE
-} from '../model/model.js';
+} from '../model/model-bak.js';
 
 // ---
 
