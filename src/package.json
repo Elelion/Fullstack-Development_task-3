@@ -1,0 +1,21 @@
+{
+  "name": "Project-3",
+  "version": "1.0.0",
+  "main": "src/scripts.js",
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Elelion/Fullstack-Development_task-3.git"
+  },
+  "keywords": [],
+  "author": "Alexander Gints",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Elelion/Fullstack-Development_task-3/issues"
+  },
+  "homepage": "https://github.com/Elelion/Fullstack-Development_task-3#readme",
+  "description": "FSD, project-3, live game"
+}

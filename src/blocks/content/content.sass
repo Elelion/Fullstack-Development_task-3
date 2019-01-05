@@ -1,0 +1,63 @@
+// ___borders___
+
+@mixin border-black
+	border: 1px solid black
+
+@mixin border-green
+	border: 1px solid green
+
+@mixin border-red
+	border: 1px solid red
+
+// ---
+
+.content
+	@include border-black
+	height: auto
+	width: 100%	
+	margin: 0 auto
+	@media screen and (max-width: 1540px)
+		display: -webkit-flex
+		display: -moz-flex
+		display: -ms-flex
+		display: -o-flex
+		-webkit-display: flex
+		-moz-display: flex
+		-ms-display: flex
+		-o-display: flex
+		display: flex
+		flex-direction: column
+		justify-content: center
+	@media screen and (max-width: 600px)
+		min-width: 60rem
+
+	&__block:nth-child(1),
+	&__block:nth-child(3)
+		width: 40%
+		height: auto
+		@media screen and (max-width: 1540px)
+			width: auto
+		
+	&__block:nth-child(2)
+		width: 59.7%
+		height: auto
+		@media screen and (max-width: 1540px)
+			width: auto
+
+	&__block_left
+		@include border-green
+		float: left
+		@media screen and (max-width: 1540px)
+			float: none
+
+	&__block_right
+		@include border-green
+		float: right
+		@media screen and (max-width: 1540px)
+			float: none
+	
+	@media screen and (max-width: 1540px)
+		&__block_top,
+		&__block_bottom,
+		&__block_center
+			float: none

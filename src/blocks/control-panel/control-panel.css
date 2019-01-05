@@ -1,0 +1,21 @@
+.control-panel {
+  border: 1px solid red;
+  width: 300px;
+  margin: 0 auto 0 auto; }
+
+.control-panel__block {
+  border: 1px solid black;
+  width: auto;
+  height: auto;
+  margin: 20px auto 20px auto; }
+
+.control-panel__block_buttons {
+  border: 1px solid blue;
+  width: 184px;
+  height: 30px; }
+
+.control-panel__block_buttons button {
+  float: left;
+  margin: 4px; }
+
+/*# sourceMappingURL=control-panel.css.map */

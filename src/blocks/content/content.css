@@ -1,0 +1,50 @@
+.content {
+  border: 1px solid black;
+  height: auto;
+  width: 100%;
+  margin: 0 auto; }
+  @media screen and (max-width: 1540px) {
+    .content {
+      display: -webkit-flex;
+      display: -moz-flex;
+      display: -ms-flex;
+      display: -o-flex;
+      -webkit-display: flex;
+      -moz-display: flex;
+      -ms-display: flex;
+      -o-display: flex;
+      display: flex;
+      flex-direction: column;
+      justify-content: center; } }
+  @media screen and (max-width: 600px) {
+    .content {
+      min-width: 60rem; } }
+  .content__block:nth-child(1), .content__block:nth-child(3) {
+    width: 40%;
+    height: auto; }
+    @media screen and (max-width: 1540px) {
+      .content__block:nth-child(1), .content__block:nth-child(3) {
+        width: auto; } }
+  .content__block:nth-child(2) {
+    width: 59.7%;
+    height: auto; }
+    @media screen and (max-width: 1540px) {
+      .content__block:nth-child(2) {
+        width: auto; } }
+  .content__block_left {
+    border: 1px solid green;
+    float: left; }
+    @media screen and (max-width: 1540px) {
+      .content__block_left {
+        float: none; } }
+  .content__block_right {
+    border: 1px solid green;
+    float: right; }
+    @media screen and (max-width: 1540px) {
+      .content__block_right {
+        float: none; } }
+  @media screen and (max-width: 1540px) {
+    .content__block_top, .content__block_bottom, .content__block_center {
+      float: none; } }
+
+/*# sourceMappingURL=content.css.map */
